@@ -29,7 +29,19 @@
     };
   };
 
-  outputs = inputs @ {...}:
+  outputs = inputs @ {...}: let
+    lib = inputs.nixpkgs.lib;
+    haumea = inputs.haumea.lib;
+
+    flakeModules =
+      lib.collect (x: lib.isPath x)
+      (
+        haumea.load {
+          src = ./modules/flake;
+          loader = haumea.loaders.path;
+        }
+      );
+  in
     inputs.flake-parts.lib.mkFlake {
       inherit inputs;
       specialArgs = {
@@ -42,10 +54,7 @@
           src = ./modules/nixos;
         };
       };
-      imports = [
-        ./modules/flake/easy-hosts.nix
-
-        ./modules/flake/haumea.nix
-      ];
+      imports =
+        flakeModules;
     });
 }
