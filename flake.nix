@@ -11,6 +11,17 @@
         nixpkgs-lib = {follows = "nixpkgs";};
       };
     };
+
+    haumea = {
+      inputs = {
+        nixpkgs = {
+          follows = "nixpkgs";
+        };
+      };
+      owner = "nix-community";
+      repo = "haumea";
+      type = "github";
+    };
     easy-hosts = {
       type = "github";
       owner = "tgirlcloud";
@@ -24,11 +35,17 @@
       specialArgs = {
         inherit inputs;
       };
-    } ({...}: let
-    in {
+    } ({...}: {
       systems = ["x86_64-linux"];
+      haumea = {
+        nixModules = {
+          src = ./modules/nixos;
+        };
+      };
       imports = [
         ./modules/flake/easy-hosts.nix
+
+        ./modules/flake/haumea.nix
       ];
     });
 }
