@@ -46,6 +46,7 @@
       inherit inputs;
       specialArgs = {
         inherit inputs;
+        flakeRoot = ./.;
       };
     } ({...}: {
       systems = ["x86_64-linux"];
