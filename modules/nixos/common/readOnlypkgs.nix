@@ -20,7 +20,7 @@ in {
     "${inputs.nixpkgs}/nixos/modules/misc/nixpkgs.nix"
   ];
   options = {
-    unfreePackagesAllowed = lib.mkOption {
+    moduleAllowedPackages = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [];
     };
