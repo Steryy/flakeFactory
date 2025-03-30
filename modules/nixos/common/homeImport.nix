@@ -2,27 +2,28 @@
   inputs,
   config,
   lib,
+  flakeRoot,
   ...
 }: let
   hn = config.networking.hostName;
-  dir = inputs.self.outPath + "/homes";
+  dir = flakeRoot + "/home";
 
   users = lib.pipe dir [
     builtins.readDir
     (lib.mapAttrs (n: _: dir + "/${n}"))
 
     (lib.mapAttrs (_: builtins.readDir))
+    (lib.mapAttrs (n: lib.filterAttrs (_: v: v == "directory")))
     (lib.mapAttrs (_:
       lib.filterAttrs (
         n: _: let
           hos = lib.removeSuffix ".nix" n;
         in
-          hos == hn
+          hos == hn && lib.pathExists "${dir}/${n}/${hn}/default.nix"
       )))
     (lib.filterAttrs (_: v: v != {}))
     (
       lib.mapAttrs (n: v: let
-        type = v."${hn}";
       in {
         imports = [
           {
@@ -32,13 +33,7 @@
               stateVersion = "25.05";
             };
           }
-          (dir
-            + "/${n}/${hn}"
-            + (
-              if type == "directory"
-              then "/default.nix"
-              else ""
-            ))
+          "${dir}/${n}/${hn}/default.nix"
         ];
       })
     )
