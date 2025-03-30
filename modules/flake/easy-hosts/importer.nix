@@ -4,11 +4,21 @@
   inputs,
   ...
 }: let
-  importer = file: let
+  nixModules =
+    config.haumea.nixModules;
+  importer = file: x: let
+    classImports = class: let
+      modules = nixModules."${class}" or {};
+    in
+      lib.optionalAttrs (modules != {}) {
+        importer."${class}" = lib.mapAttrsRecursive (_: _: lib.mkDefault true) modules;
+      };
     evaled =
       (lib.evalModules {
         modules = [
           file
+          (classImports "common")
+          (classImports "${x.class}")
           {
             options.importer =
               lib.mapAttrsRecursive (
@@ -56,7 +66,7 @@ in {
                 x.modules
                 ++ (
                   addModules file
-                  [(importer file)]
+                  [(importer file x)]
                 )
                 ++ (
                   addModules disko
