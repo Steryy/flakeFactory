@@ -58,31 +58,20 @@ in {
           x: let
             file = x._path + "/importer.nix";
             facter = x._path + "/facter.json";
-            disko = x._path + "/disko.nix";
-          in
-            x
-            // {
-              modules =
-                x.modules
-                ++ (
-                  addModules file
-                  [(importer file x)]
-                )
-                ++ (
-                  addModules disko
-                  [
-                    inputs.nixos-facter-modules.nixosModules.facter
-                    disko
-                  ]
-                )
-                ++ (
-                  addModules facter
-                  [
-                    inputs.nixos-facter-modules.nixosModules.facter
-                    {config.facter.reportPath = facter;}
-                  ]
-                );
-            }
+          in {
+            modules =
+              (
+                addModules file
+                [(importer file x)]
+              )
+              ++ (
+                addModules facter
+                [
+                  inputs.nixos-facter-modules.nixosModules.facter
+                  {config.facter.reportPath = facter;}
+                ]
+              );
+          }
         )
       ];
     };

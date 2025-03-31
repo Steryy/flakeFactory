@@ -36,9 +36,7 @@ in {
 
       functionsList = [
         (
-          v:
-            (cfg.classesDefaults."${v.class}" or {})
-            // v
+          v: (cfg.classesDefaults."${v.class}" or {})
         )
       ];
       additionalClasses =

@@ -54,6 +54,9 @@
         nixModules = {
           src = ./modules/nixos;
         };
+        diskoModules = {
+          src = ./modules/disko;
+        };
       };
       imports =
         flakeModules;
