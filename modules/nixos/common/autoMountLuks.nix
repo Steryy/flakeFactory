@@ -5,7 +5,11 @@
 }: let
   concMap = func: list:
     builtins.concatStringsSep "\n"
-    (map func list);
+    (
+      lib.flatten (
+        map func list
+      )
+    );
 in {
   options = {
     autoMount = {
@@ -86,13 +90,14 @@ in {
 
       environment.etc.crypttab = {
         mode = "0600";
-        text = concMap (x: let
-          ops = builtins.concatStringsSep "," (["noauto"] ++ x.opts);
-        in
-          lib.flatten (
-            map (key: "${x.volname} UUID=${x.uuid} ${key} ${ops}") x.keyFiles
-          ))
-        config.autoMount.luks;
+        text =
+          concMap (
+            x: let
+              ops = builtins.concatStringsSep "," (["noauto"] ++ x.opts);
+            in
+              map (key: "${x.volname} UUID=${x.uuid} ${key} ${ops}") x.keyFiles
+          )
+          config.autoMount.luks;
       };
     };
 }
