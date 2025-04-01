@@ -17,6 +17,7 @@ in {
   options.easy-hosts.hostsBare = lib.mkOption {
     type = lib.types.attrsOf (lib.types.submodule {
       options = {
+        _secrets = lib.mkEnableOption "Enable secrets for host" // {default = true;};
         _path = lib.mkOption {
           type = lib.types.path;
         };
@@ -92,6 +93,6 @@ in {
       #   # lib.pipe v cfg.functionsList
       # )
     ))
-    (lib.mapAttrs (_: v: lib.removeAttrs v ["_path" "_hostName"]))
+    (lib.mapAttrs (_: v: lib.removeAttrs v ["_path" "_hostName" "_secrets"]))
   ];
 }
