@@ -44,7 +44,6 @@ in {
   ];
   config.
   home-manager = {
-    extraSpecialArgs = {inherit inputs;};
     inherit users;
   };
 }
