@@ -9,8 +9,6 @@
   ];
   easy-hosts = {
     shared.modules = [
-      {
-      }
       ({
         options,
         lib,
