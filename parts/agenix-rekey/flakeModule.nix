@@ -12,12 +12,14 @@ in {
   imports = [
     inputs.agenix-rekey.flakeModule
   ];
-  perSystem.
-agenix-rekey.nixosConfigurations =
-    lib.filterAttrs (n: _: lib.elem n hostNames)
-    inputs.self.nixosConfigurations;
+
+  perSystem = {...}: {
+    agenix-rekey.nixosConfigurations = lib.filterAttrs (n: _: lib.elem n hostNames); # (not technically needed, as it is already the default)
+  };
   easy-hosts.functionsList = [
-    (x:
+    (x: let
+      key = config.haumea.publicVars."${x._hostName}".pubkey;
+    in
       if x._secrets
       then {
         modules = [
@@ -34,9 +36,9 @@ agenix-rekey.nixosConfigurations =
               ];
             };
           })
-          {
+          (_: {
             age.rekey = {
-              # hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOy3dC8cCbucumHphroUzZUTKkM0jL3mG3+tkeAWgIdX";
+              hostPubkey = lib.throwIfNot (key ? "value") "${x._hostName} dont have public key set" key.value;
               masterIdentities = [
                 {
                   identity = "~/.config/sops/age/keys.txt";
@@ -44,9 +46,9 @@ agenix-rekey.nixosConfigurations =
                 }
               ];
               storageMode = "local";
-              localStorageDir = flakeRoot + "/secrets/rekeyed/${config.networking.hostName}";
+              localStorageDir = flakeRoot + "/vars/secrets/rekeyed/${x._hostName}";
             };
-          }
+          })
         ];
       }
       else {})

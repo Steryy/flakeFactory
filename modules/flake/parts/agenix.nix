@@ -7,7 +7,10 @@
   dir = flakeRoot + "/parts/${name}";
 in {
   flake.part = config.partitions;
-  partitionedAttrs."${name}" = "${name}";
+  partitionedAttrs={
+    "${name}" = "${name}";
+    nixosConfigurations = "${name}";
+  };
   partitions."${name}" = {
     extraInputsFlake = dir;
     module = {...}: {
