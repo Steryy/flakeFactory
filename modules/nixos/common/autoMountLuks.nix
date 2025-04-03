@@ -10,8 +10,9 @@
         map func list
       )
     );
+  cfg = config.common.autoMount.luks;
 in {
-  options = {
+  options.common = {
     autoMount = {
       luks = lib.mkOption {
         type = lib.types.listOf (
@@ -59,7 +60,7 @@ in {
     };
   };
   config =
-    lib.mkIf (config.autoMount.luks != [])
+    lib.mkIf (cfg != [])
     {
       services.udev.extraRules =
         concMap (
@@ -69,8 +70,8 @@ in {
             ACTION=="add", ENV{ID_FS_UUID}=="${x.uuid}", ENV{SYSTEMD_WANTS}+="${cryptservice x.volname}"
           ''
         )
-        config.autoMount.luks;
-      fileSystems = lib.pipe config.autoMount.luks [
+        cfg;
+      fileSystems = lib.pipe cfg [
         (map (
           x:
             map (mount: {
@@ -97,7 +98,7 @@ in {
             in
               map (key: "${x.volname} UUID=${x.uuid} ${key} ${ops}") x.keyFiles
           )
-          config.autoMount.luks;
+          cfg;
       };
     };
 }
