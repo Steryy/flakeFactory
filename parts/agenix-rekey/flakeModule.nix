@@ -8,13 +8,16 @@
   hostNames = lib.attrNames (
     lib.filterAttrs (_: v: v._secrets) config.easy-hosts.hostsBare
   );
+  flakeConfg = config.flake;
 in {
   imports = [
     inputs.agenix-rekey.flakeModule
   ];
 
   perSystem = {...}: {
-    agenix-rekey.nixosConfigurations = lib.filterAttrs (n: _: lib.elem n hostNames); # (not technically needed, as it is already the default)
+    agenix-rekey.nixosConfigurations =
+      lib.filterAttrs (n: _: lib.elem n hostNames)
+      flakeConfg.nixosConfigurations;
   };
   easy-hosts.functionsList = [
     (x: let
@@ -36,8 +39,10 @@ in {
               ];
             };
           })
-          (_: {
-            age.rekey = {
+          {
+            age.rekey = let
+              secDir = flakeRoot + "/vars/per-host/${x._hostName}";
+            in {
               hostPubkey = lib.throwIfNot (key ? "value") "${x._hostName} dont have public key set" key.value;
               masterIdentities = [
                 {
@@ -46,9 +51,12 @@ in {
                 }
               ];
               storageMode = "local";
-              localStorageDir = flakeRoot + "/vars/secrets/rekeyed/${x._hostName}";
+              generatedSecretsDir = secDir + "/generated";
+
+              secretsDir = secDir + "/secrets";
+              localStorageDir = secDir;
             };
-          })
+          }
         ];
       }
       else {})
