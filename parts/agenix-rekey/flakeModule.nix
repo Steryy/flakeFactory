@@ -21,7 +21,16 @@ in {
   };
   easy-hosts.functionsList = [
     (x: let
-      key = config.haumea.publicVars."${x._hostName}".pubkey;
+      secDir = flakeRoot + "/vars/${x._hostName}";
+      commonConf = {
+        masterIdentities = [
+          {
+            identity = "$HOME/.config/sops/age/keys.txt";
+            pubkey = "age1wlv6g495tdgsm3vyd28v48j3uydc0se00pa2fzr8w24uelw99fdsu2gr0a";
+          }
+        ];
+        storageMode = "local";
+      };
     in
       if x._secrets
       then {
@@ -31,31 +40,35 @@ in {
           ({options, ...}: {
             config = lib.optionalAttrs (options ? "home-manager") {
               home-manager.sharedModules = [
-                ({...}: {
+                ({config, ...}: {
                   imports = [
+                    inputs.agenix-rekey.homeManagerModules.default
                     inputs.agenix.homeManagerModules.age
                   ];
+                  age.rekey =
+                    commonConf
+                    // {
+                      generatedSecretsDir = secDir + "/users/${config.home.username}/generated";
+
+                      secretsDir = secDir + "/users/${config.home.username}/secrets";
+                      localStorageDir = secDir + "/users/${config.home.username}";
+                    };
                 })
               ];
             };
           })
           {
             age.rekey = let
-              secDir = flakeRoot + "/vars/per-host/${x._hostName}";
-            in {
-              hostPubkey = lib.throwIfNot (key ? "value") "${x._hostName} dont have public key set" key.value;
-              masterIdentities = [
-                {
-                  identity = "~/.config/sops/age/keys.txt";
-                  pubkey = "age1wlv6g495tdgsm3vyd28v48j3uydc0se00pa2fzr8w24uelw99fdsu2gr0a";
-                }
-              ];
-              storageMode = "local";
-              generatedSecretsDir = secDir + "/generated";
+              key = secDir + "/pubkey.txt";
+            in
+              commonConf
+              // {
+                generatedSecretsDir = secDir + "/generated";
 
-              secretsDir = secDir + "/secrets";
-              localStorageDir = secDir;
-            };
+                secretsDir = secDir + "/secrets";
+                localStorageDir = secDir;
+                hostPubkey = lib.throwIfNot (lib.pathExists key) "${x._hostName} dont have public key set" (lib.readFile key);
+              };
           }
         ];
       }
