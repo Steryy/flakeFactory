@@ -27,6 +27,12 @@
       owner = "tgirlcloud";
       repo = "easy-hosts";
     };
+    disko = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      owner = "nix-community";
+      repo = "disko";
+      type = "github";
+    };
   };
 
   outputs = inputs @ {...}: let
