@@ -15,6 +15,7 @@ in {
   options.common = {
     autoMount = {
       luks = lib.mkOption {
+        default = [];
         type = lib.types.listOf (
           lib.types.submodule ({config, ...}: {
             options = {
