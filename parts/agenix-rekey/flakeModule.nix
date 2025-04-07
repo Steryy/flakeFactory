@@ -25,8 +25,7 @@ in {
       commonConf = {
         masterIdentities = [
           {
-            identity = "$HOME/.config/sops/age/keys.txt";
-            pubkey = "age1wlv6g495tdgsm3vyd28v48j3uydc0se00pa2fzr8w24uelw99fdsu2gr0a";
+            identity = flakeRoot + "/privkey.age";
           }
         ];
         storageMode = "local";
@@ -45,19 +44,25 @@ in {
                     inputs.agenix-rekey.homeManagerModules.default
                     inputs.agenix.homeManagerModules.age
                   ];
-                  age.rekey =
+                  age.rekey = let
+                    secretDir = secDir + "/users/${config.home.username}";
+                  in
                     commonConf
                     // {
-                      generatedSecretsDir = secDir + "/users/${config.home.username}/generated";
+                      generatedSecretsDir = secretDir + "/generated";
 
-                      secretsDir = secDir + "/users/${config.home.username}/secrets";
-                      localStorageDir = secDir + "/users/${config.home.username}";
+                      secretsDir = secretDir + "/secrets";
+                      localStorageDir = secretDir + "/local";
                     };
                 })
               ];
             };
           })
+          ({config, ...}: {
+            age.identityPaths = map (x: x.path) config.services.openssh.hostKeys;
+          })
           {
+            # age.identityPaths
             age.rekey = let
               key = secDir + "/pubkey.txt";
             in
@@ -66,7 +71,7 @@ in {
                 generatedSecretsDir = secDir + "/generated";
 
                 secretsDir = secDir + "/secrets";
-                localStorageDir = secDir;
+                localStorageDir = secDir + "/local";
                 hostPubkey = lib.throwIfNot (lib.pathExists key) "${x._hostName} dont have public key set" (lib.readFile key);
               };
           }
