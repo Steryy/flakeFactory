@@ -3,11 +3,13 @@
   config,
   options,
   ...
-}: let
+}:
+let
   cfg = config.common.specialUser;
   groupsExists = groups: lib.filter (g: lib.hasAttr g config.users.groups) groups;
-in {
-  options.common. specialUser = lib.mkOption {
+in
+{
+  options.common.specialUser = lib.mkOption {
     type = lib.types.str;
   };
 
@@ -18,11 +20,10 @@ in {
     (lib.optionalAttrs (options ? "age") {
       age = {
         secrets = {
-          "${cfg}pass" = {};
+          "${cfg}pass" = { };
         };
       };
-      users.users."${cfg}".hashedPasswordFile =
-        config.age.secrets."${cfg}pass".path;
+      users.users."${cfg}".passwordFile = config.age.secrets."${cfg}pass".path;
     })
     {
       users.users."${cfg}" = {
@@ -63,8 +64,4 @@ in {
       };
     }
   ];
-  # config =  {
-  #   users.u
-  #   # common.speciialUsers.users   ;
-  # };
 }
