@@ -24,6 +24,7 @@
     shared.specialArgs = {
       inherit inputs;
       inherit flakeRoot;
+      homeModules = config.haumea.homeModules;
     };
   };
 }

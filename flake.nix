@@ -12,6 +12,9 @@
       };
     };
 
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
     haumea = {
       inputs = {
         nixpkgs = {
@@ -59,6 +62,9 @@
       haumea = {
         nixModules = {
           src = ./modules/nixos;
+        };
+        homeModules = {
+          src = ./modules/home;
         };
         diskoModules = {
           src = ./modules/disko;
