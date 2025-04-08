@@ -3,24 +3,25 @@
   config,
   options,
   ...
-}:
-let
+}: let
   cfg = config.common.specialUser;
   groupsExists = groups: lib.filter (g: lib.hasAttr g config.users.groups) groups;
-in
-{
+in {
   options.common.specialUser = lib.mkOption {
     type = lib.types.str;
   };
 
   config = lib.mkMerge [
+    (lib.optionalAttrs (options ? "persistence") {
+      persistence.userNames = [cfg];
+    })
     (lib.optionalAttrs (!(options ? "age")) {
       users.users."${cfg}".initialPassword = "changeme";
     })
     (lib.optionalAttrs (options ? "age") {
       age = {
         secrets = {
-          "${cfg}pass" = { };
+          "${cfg}pass" = {};
         };
       };
       users.users."${cfg}".passwordFile = config.age.secrets."${cfg}pass".path;

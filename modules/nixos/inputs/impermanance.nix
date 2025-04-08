@@ -4,8 +4,8 @@
   config,
   ...
 }: let
-  cfg = config.impermanence;
-  normalUsers = lib.filterAttrs (_: v: v.isNormalUser) config.users.users;
+  cfg = config.persistence;
+  # normalUsers = lib.attrNames (lib.filterAttrs (_: v: v.isNormalUser) config.users.users);
   dirDef = {
     dir,
     directories ? [],
@@ -21,11 +21,6 @@
         type = lib.types.listOf lib.types.str;
         default =
           userDirs;
-        #     [
-        #   ".local/state/nix"
-        #   ".local/share/home-manager"
-        #   ".ssh"
-        # ];
       };
     };
 
@@ -49,7 +44,7 @@
     };
   };
 in {
-  options.impermanence = {
+  options.persistence = {
     state = dirDef {
       dir = "/persist/@state";
       files = [
@@ -74,6 +69,11 @@ in {
         ".cache"
       ];
     };
+    userNames = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      # default = normalUsers;
+    };
     device = lib.mkOption {
       type = lib.types.str;
     };
@@ -93,14 +93,8 @@ in {
         value = {
           inherit (v) directories;
           users =
-            lib.mapAttrs (_: _: {
-              inherit
-                (v.users)
-                directories
-                files
-                ;
-            })
-            normalUsers;
+            lib.genAttrs cfg.userNames (_: {
+            });
         };
       })
       {
