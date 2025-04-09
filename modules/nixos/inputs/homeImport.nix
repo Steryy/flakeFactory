@@ -71,7 +71,7 @@
   users = lib.pipe dir [
     builtins.readDir
     (lib.mapAttrs (n: _: dir + "/${n}"))
-
+    (lib.filterAttrs (_: v: v == "directory"))
     (lib.mapAttrs (_: builtins.readDir))
     (lib.mapAttrs (_: lib.filterAttrs (_: v: v == "directory")))
     (lib.mapAttrs (user:
