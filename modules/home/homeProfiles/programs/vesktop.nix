@@ -2,13 +2,8 @@
   pkgs,
   lib,
   options,
-  inputs,
   ...
 }: {
-  imports = [
-    inputs.nixcord.homeManagerModules.nixcord
-  ];
-
   config = lib.mkMerge [
     (
       lib.optionalAttrs (options ? "persistence")
@@ -16,6 +11,12 @@
         persistence.cache.directories = [
           ".config/vesktop"
         ];
+      }
+    )
+
+    (
+      lib.optionalAttrs (! (options.programs ? "nixcord") && options ? "stylix") {
+        stylix.targets.vesktop.enable = true;
       }
     )
     (
@@ -34,11 +35,6 @@
           discord.enable = false;
           # quickCss = "some CSS"; # quickCSS file
           config = {
-            # useQuickCss = true; # use out quickCSS
-            # themeLinks = [
-            #   # "https://github.com/ClearVision/ClearVision-v6/releases/download/6.9.0/ClearVision_v6.theme.css"
-            #   # or use an online theme
-            #   # "https://raw.githubusercontent.com/link/to/some/theme.css"
             # ];
             frameless = true; # set some Vencord options
             plugins = {
