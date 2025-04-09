@@ -87,14 +87,16 @@ in {
     inputs.impermanence.nixosModules.impermanence
   ];
   config = {
+    programs.fuse.userAllowOther = true;
     environment.persistence =
       lib.mapAttrs' (_: v: {
         name = v.directory;
         value = {
+          hideMounts = true;
           inherit (v) directories;
-          users =
-            lib.genAttrs cfg.userNames (_: {
-            });
+          users = lib.genAttrs cfg.userNames (_: {
+            inherit (v.users) files directories;
+          });
         };
       })
       {
