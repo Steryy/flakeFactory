@@ -22,17 +22,13 @@ in {
   easy-hosts.functionsList = [
     (x: let
       secDir = flakeRoot + "/vars/${x._hostName}";
-      commonConf = {
-        masterIdentities = [
-          {
-            identity = flakeRoot + "/privkey.age";
-          }
-        ];
-        storageMode = "local";
-      };
     in
       if x._secrets
       then {
+        commonConf = {
+          masterIdentities = [{ identity = "/run/secrets/privkey.age"; }];
+          storageMode = "local";
+        };
         modules = [
           inputs.agenix.nixosModules.default
           inputs.agenix-rekey.nixosModules.default
