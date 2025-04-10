@@ -23,7 +23,6 @@ in {
     default = {};
   };
   config = {
-    flake.easy = config.easy-hosts;
     easy-hosts = {
       classesDefaults = {
         waifus = {

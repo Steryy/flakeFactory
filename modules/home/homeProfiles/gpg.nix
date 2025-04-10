@@ -5,7 +5,7 @@
 }: let
   agentTimeout = 60 * 60 * 39;
 in {
-  services.gpgUnloc = {
+  services.gpgUnlock = {
     envfile =
       config.age.secrets."gpg.env".path;
     enable = true;
