@@ -22,7 +22,7 @@
       / preLightness
       * 255.0;
     round = x: let
-      floored = lib.floor x;
+      floored = builtins.floor x;
       diff = x - floored;
     in
       if diff >= 0.5
@@ -31,7 +31,7 @@
     adjust = int:
       lib.pipe int [
         (lib.elemAt values)
-        lib.fromJSON
+        builtins.fromJSON
         (x: x * adj)
         (lib.min 255.0)
         (lib.max 0.0)
