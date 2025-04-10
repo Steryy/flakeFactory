@@ -1,5 +1,5 @@
 {
-  programs.ghoastty = {
+  programs.ghostty = {
     enable = true;
     installVimSyntax = true;
     installBatSyntax = true;
