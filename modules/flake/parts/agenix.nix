@@ -1,22 +1,15 @@
-{
-  flakeRoot,
-  config,
-  ...
-}: let
+{ config, ... }:
+let
   name = "agenix-rekey";
-  dir = flakeRoot + "/parts/${name}";
+  dir = ./. + "/_${name}";
 in {
   flake.part = config.partitions;
-  partitionedAttrs={
+  partitionedAttrs = {
     "${name}" = "${name}";
     nixosConfigurations = "${name}";
   };
   partitions."${name}" = {
     extraInputsFlake = dir;
-    module = {...}: {
-      imports = [
-        (dir + "/flakeModule.nix")
-      ];
-    };
+    module = { ... }: { imports = [ (dir + "/flakeModule.nix") ]; };
   };
 }
