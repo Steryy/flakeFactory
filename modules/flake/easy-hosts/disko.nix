@@ -78,24 +78,6 @@
     (lib.filterAttrs (n: _: !lib.hasPrefix "_" n) attr);
 in {
   config = {
-    flake. diskoConfigurations = lib.pipe config.easy-hosts.hostsBare [
-      (lib.filterAttrs (_: x: lib.pathExists "${x._path}/disko.nix"))
-      (lib.mapAttrs (
-        v: x: let
-          cfg =
-            config.flake.nixosConfigurations."${v}".config;
-        in {
-          disko.devices.disk =
-            lib.mapAttrs (_: v: {
-              inherit (v) device;
-              content =
-                removeDash v.content;
-              # inherit (v) content;
-            })
-            cfg.disko.devices.disk;
-        }
-      ))
-    ];
     easy-hosts.functionsList = [
       (
         x: let
