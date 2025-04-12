@@ -1,13 +1,9 @@
-{
-  inputs,
-  config,
-  flakeRoot,
-  ...
-}: {
-  imports = [
-    inputs.easy-hosts.flakeModule
-  ];
+{ lib, inputs, config, flakeRoot, ... }: {
+  imports = [ inputs.easy-hosts.flakeModule ];
   easy-hosts = {
+
+    functionsList =
+      [ (x: { modules = [{ _module.args.class = lib.mkForce x.class; }]; }) ];
     shared.modules = [
       { nix.settings.experimental-features = [ "nix-command" "flakes" ]; }
       ({ options, lib, ... }: {

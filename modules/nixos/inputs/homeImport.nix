@@ -1,72 +1,57 @@
-{
-  inputs,
-  config,
-  lib,
-  flakeRoot,
-  homeModules,
-  ...
-}: let
+{ inputs, config, lib, flakeRoot, homeModules, class, ... }:
+let
   hn = config.networking.hostName;
   dir = flakeRoot + "/homes";
 
-  importer = file: x: let
-    classImports = class: let
-      modules = homeModules."${class}" or {};
-    in
-      lib.optionalAttrs (modules != {}) {
-        importer."${class}" = lib.mapAttrsRecursive (_: _: lib.mkDefault true) modules;
-      };
-    foru =
-      if lib.pathExists file
-      then file
-      else {};
-    evaled =
-      (lib.evalModules {
-        modules = [
-          foru
+  importer = lib.mapAttrsRecursive (path: v:
+    lib.mkOption {
+      default = { };
+      type = lib.types.submodule ({ config, ... }: {
+        options = {
+          enable = lib.mkEnableOption
+            ("Enable " + (lib.strings.concatStringsSep " " path));
+          path = lib.mkOption {
+            type = lib.types.nullOr lib.types.path;
+            readOnly = true;
+            default = if config.enable then v else null;
 
-          (classImports "common")
-          (classImports "${x.class}")
-          {
-            options.importer =
-              lib.mapAttrsRecursive (
-                path: _: let
-                in
-                  lib.mkEnableOption ""
-              )
-              homeModules;
-          }
-        ];
-      })
-      .config;
-    toPe =
-      lib.collect (x: x ? "value" && x ? "path")
-      (lib.mapAttrsRecursive (path: value: {
-          inherit value path;
-        })
-        evaled.importer);
-    tmpfunc = fe:
-      map (x: lib.getAttrFromPath x.path homeModules)
-      (
-        lib.filter (x: x.value == fe) toPe
-      );
-  in {
-    imports =
-      tmpfunc true
-      ++ [
-        {
-          options.importer =
-            lib.mapAttrsRecursive (
-              path: _: let
-              in
-                lib.mkEnableOption ""
-            )
-            homeModules;
-          config.importer = evaled.importer;
-        }
+          };
+
+        };
+      });
+    }) homeModules;
+
+  defaultImport = class:
+    lib.mapAttrsRecursive (path: _:
+      if lib.lists.elemAt path 1 == class then {
+        enable = lib.mkDefault true;
+      } else
+        { }) { importer = homeModules; };
+  eval = x:
+    let
+      modulesToAdd = [
+        { options = { inherit importer; }; }
+        (defaultImport (x.class or ""))
+        (defaultImport "common")
       ];
-    disabledModules = tmpfunc false;
-  };
+      evaled = lib.evalModules {
+
+        specialArgs = x.specialArgs or { };
+        modules =
+
+          (x.modules or [ ]) ++ modulesToAdd ++ [{
+            config._module.check = true;
+            config._module.freeformType = lib.types.unspecified;
+
+          }];
+      };
+    in {
+      modules = modulesToAdd ++ [{
+        imports = map (x: x.path) (lib.collect
+          (x: x ? "path" && x ? "enable" && x.enable && lib.isPath x.path)
+          evaled.config.importer);
+      }];
+    };
 
   users = lib.pipe dir [
     builtins.readDir
@@ -75,43 +60,32 @@
     (lib.mapAttrs (_: builtins.readDir))
     (lib.mapAttrs (_: lib.filterAttrs (_: v: v == "directory")))
     (lib.mapAttrs (user:
-      lib.filterAttrs (
-        n: _: let
-          hos = lib.removeSuffix ".nix" n;
-        in
-          hos
-          == hn
-          && lib.pathExists "${dir}/${user}/${hn}/default.nix"
-      )))
-    (lib.filterAttrs (_: v: v != {}))
-    (
-      lib.mapAttrs (n: _: {
-        imports = [
-          {
-            _module.args = {
-              user = config.users.users."${n}" or {};
-            };
-          }
-          (importer "${dir}/${n}/${hn}/importer.nix" {class = "waifus";})
-          {
-            home = lib.mkDefault {
-              username = n;
-              homeDirectory = "/home/${n}";
-              stateVersion = "25.05";
-            };
-          }
-          "${dir}/${n}/${hn}/default.nix"
-        ];
-      })
-    )
+      lib.filterAttrs (n: _:
+        let hos = lib.removeSuffix ".nix" n;
+        in hos == hn && lib.pathExists "${dir}/${user}/${hn}/default.nix")))
+    (lib.filterAttrs (_: v: v != { }))
+    (lib.mapAttrs (n: _:
+      let
+        modules = [{
+          imports = [
+            {
+              home = lib.mkDefault {
+                username = n;
+                homeDirectory = "/home/${n}";
+                stateVersion = "25.05";
+              };
+            }
+            "${dir}/${n}/${hn}/default.nix"
+          ];
+        }];
+        importerModules = (eval {
+          inherit modules;
+          inherit class;
+        });
+
+      in { imports = modules ++ importerModules.modules; }))
   ];
 in {
-  imports = [
-    inputs.home-manager.nixosModules.home-manager
-  ];
-  config = {
-    home-manager = {
-      inherit users;
-    };
-  };
+  imports = [ inputs.home-manager.nixosModules.home-manager ];
+  config = { home-manager = { inherit users; }; };
 }
