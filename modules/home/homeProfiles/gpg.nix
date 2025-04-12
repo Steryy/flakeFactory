@@ -10,6 +10,7 @@ in {
       config.age.secrets."gpg.env".path;
     enable = true;
   };
+systemd.user.services.gpgunlock.Unit.After = ["agenix.service"];
   age.secrets = {
     "gpg.env" = {};
   };

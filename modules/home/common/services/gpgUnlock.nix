@@ -26,8 +26,8 @@ in {
     Unit = {
       Description = "Unlock gpg keys";
 
-      Requires = "gpg-agent.service";
-      After = "gpg-agent.service";
+      Requires = ["gpg-agent.service"];
+      After = ["gpg-agent.service"];
     };
 
     Install = {WantedBy = ["default.target"];};
