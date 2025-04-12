@@ -1,79 +1,54 @@
-{
-  lib,
-  config,
-  inputs,
-  ...
-}: let
-  nixModules =
-    config.haumea.nixModules;
-  importer = file: x: let
-    classImports = class: let
-      modules = nixModules."${class}" or {};
-    in
-      lib.optionalAttrs (modules != {}) {
-        importer."${class}" = lib.mapAttrsRecursive (_: _: lib.mkDefault true) modules;
-      };
-    evaled =
-      (lib.evalModules {
-        modules = [
-          file
-          (classImports "common")
-          (classImports "${x.class}")
-          {
-            options.importer =
-              lib.mapAttrsRecursive (
-                path: _: let
-                in
-                  lib.mkEnableOption ""
-              )
-              config.haumea.nixModules;
-          }
-        ];
-      })
-      .config;
-    toPe =
-      lib.collect (x: x ? "value" && x ? "path")
-      (lib.mapAttrsRecursive (path: value: {
-          inherit value path;
-        })
-        evaled.importer);
-    tmpfunc = fe:
-      map (x: lib.getAttrFromPath x.path config.haumea.nixModules)
-      (
-        lib.filter (x: x.value == fe) toPe
-      );
-  in {
-    imports = tmpfunc true;
-    disabledModules = tmpfunc false;
-  };
-  addModules = file: modules:
-    if lib.pathExists file
-    then modules
-    else [];
-in {
-  config = {
-    easy-hosts = {
-      functionsList = [
-        (
-          x: let
-            file = x._path + "/importer.nix";
-            facter = x._path + "/facter.json";
-          in {
-            modules =
-              (
-                addModules file
-                [(importer file x)]
-              )
-              ++ (
-                addModules facter
-                [
-                  inputs.nixos-facter-modules.nixosModules.facter
-                  {config.facter.reportPath = facter;}
-                ]
-              );
-          }
-        )
+{ lib, config, ... }:
+let
+  nixModules = config.haumea.nixModules;
+  importer = lib.mapAttrsRecursive (path: v:
+    lib.mkOption {
+      default = { };
+      type = lib.types.submodule ({ config, ... }: {
+        options = {
+          enable = lib.mkEnableOption
+            ("Enable " + (lib.strings.concatStringsSep " " path));
+          path = lib.mkOption {
+            type = lib.types.nullOr lib.types.path;
+            readOnly = true;
+            default = if config.enable then v else null;
+
+          };
+
+        };
+      });
+    }) nixModules;
+
+  defaultImport = class:
+    lib.mapAttrsRecursive (path: _:
+      if lib.lists.elemAt path 1 == class then {
+        enable = lib.mkDefault true;
+      } else
+        { }) { importer = nixModules; };
+  eval = x:
+    let
+      modulesToAdd = [
+        { options = { inherit importer; }; }
+        (defaultImport (x.class or ""))
+        (defaultImport "common")
       ];
+      evaled = lib.evalModules {
+
+        specialArgs = x.specialArgs or { };
+        modules =
+
+          (x.modules or [ ]) ++ modulesToAdd ++ [{
+            config._module.check = true;
+            config._module.freeformType = lib.types.unspecified;
+
+          }];
+      };
+    in {
+      modules = modulesToAdd ++ [{
+        imports = map (x: x.path) (lib.collect
+          (x: x ? "path" && x ? "enable" && x.enable && lib.isPath x.path)
+          evaled.config.importer);
+      }];
     };
-  };
-}
+
+in { config = { easy-hosts = { functionsList = [ (x: eval x) ]; }; }; }
