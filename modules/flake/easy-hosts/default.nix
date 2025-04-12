@@ -9,15 +9,13 @@
   ];
   easy-hosts = {
     shared.modules = [
-      ({
-        options,
-        lib,
-        ...
-      }: {
+      { nix.settings.experimental-features = [ "nix-command" "flakes" ]; }
+      ({ options, lib, ... }: {
         config = lib.optionalAttrs (options ? "home-manager") {
-          home-manager.extraSpecialArgs = {
-            inherit flakeRoot inputs;
-          };
+          home-manager.sharedModules = [{
+            nix.settings.experimental-features = [ "nix-command" "flakes" ];
+          }];
+          home-manager.extraSpecialArgs = { inherit flakeRoot inputs; };
         };
       })
     ];
