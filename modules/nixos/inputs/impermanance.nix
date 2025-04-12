@@ -1,26 +1,16 @@
-{
-  inputs,
-  lib,
-  config,
-  ...
-}: let
+{ inputs, lib, config, options, ... }:
+let
   cfg = config.persistence;
   # normalUsers = lib.attrNames (lib.filterAttrs (_: v: v.isNormalUser) config.users.users);
-  dirDef = {
-    dir,
-    directories ? [],
-    files ? [],
-    userDirs ? [],
-  }: {
+  dirDef = { dir, directories ? [ ], files ? [ ], userDirs ? [ ], }: {
     users = {
       files = lib.mkOption {
         type = lib.types.listOf lib.types.str;
-        default = [];
+        default = [ ];
       };
       directories = lib.mkOption {
         type = lib.types.listOf lib.types.str;
-        default =
-          userDirs;
+        default = userDirs;
       };
     };
 
@@ -30,130 +20,123 @@
     };
     directories = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default =
-        directories
+      default = directories
         #     [
         #   "/var/log"
         #   "/var/lib"
         # ]
-        ;
+      ;
     };
     directory = lib.mkOption {
       type = lib.types.str;
       default = dir;
     };
   };
+  deviceDependency = if lib.hasPrefix "/dev/mapper/" cfg.device then
+    "dev-mapper-${lib.removePrefix "/dev/mapper/" cfg.device}.device"
+  else if lib.hasPrefix "/dev/disk/by-partlabel/" cfg.device then
+    "dev-disk-by\\x2dpartlabel${
+      lib.removePrefix "/dev/mapper/" cfg.device
+    }.device"
+  else
+    throw "only /dev/mapper and /dev/disk/by-partlabel are supported";
+
 in {
   options.persistence = {
     state = dirDef {
       dir = "/persist/@state";
-      files = [
-        "/etc/machine-id"
-      ];
+      files = [ "/etc/machine-id" ];
       directories = [
         "/var/log"
-        "/var/lib/sbctl"
-        "/var/lib/bluetooth"
-        "/var/lib/nixos"
+        "/var/lib"
+        "/etc/NetworkManager/system-connections"
+        "/etc/ssh"
       ];
-      userDirs = [
-        ".config/nix"
-        ".local/state/nix"
-        ".local/share/home-manager"
-      ];
+      userDirs = [ ];
     };
 
     cache = dirDef {
       dir = "/persist/@cache";
-      userDirs = [
-        ".cache"
-      ];
+      userDirs = [ ".ssh" ".local/state/nix" ];
     };
     userNames = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [];
+      default = [ ];
       # default = normalUsers;
     };
-    device = lib.mkOption {
-      type = lib.types.str;
-    };
-    rollbacks = {
-      btrfs = {
-        enable = lib.mkEnableOption "btrfs rollback";
-      };
-    };
+
+    device = lib.mkOption { type = lib.types.str; };
+    rollbacks = { btrfs = { enable = lib.mkEnableOption "btrfs rollback"; }; };
   };
-  imports = [
-    inputs.impermanence.nixosModules.impermanence
-  ];
-  config = {
-    programs.fuse.userAllowOther = true;
-    environment.persistence =
-      lib.mapAttrs' (_: v: {
+  imports = [ inputs.impermanence.nixosModules.impermanence ];
+  config = lib.mkMerge [
+    { fileSystems."/persist".neededForBoot = true; }
+    (lib.optionalAttrs (options ? "age") {
+      services.openssh.hostKeys = [
+        {
+          path = cfg.state.directory + "/etc/ssh/ssh_host_rsa_key";
+          type = "rsa";
+          bits = 4096;
+        }
+        {
+          path = cfg.state.directory + "/etc/ssh/ssh_host_ed25519_key";
+          type = "ed25519";
+        }
+      ];
+    })
+    {
+
+      boot.initrd.systemd.services.clean = {
+        wantedBy = [ "initrd.target" ];
+        before = [ "sysroot.mount" ];
+        unitConfig.DefaultDependencies = "no";
+        serviceConfig.Type = "oneshot";
+        # requires = [ deviceDependency ];
+        #
+        after = [ deviceDependency ];
+      };
+
+    }
+    (lib.mkIf cfg.rollbacks.btrfs.enable {
+      boot.initrd.systemd.services.clean = {
+        description = "Rollback BTRFS root subvolume to a pristine state";
+        script = ''
+          mkdir /btrfs_tmp
+          mount ${cfg.device} -o btrfs /btrfs_tmp
+          if [[ -e /btrfs_tmp/root ]]; then
+              mkdir -p /btrfs_tmp/old_roots
+              timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
+              mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
+          fi
+
+          delete_subvolume_recursively() {
+              IFS=$'\n'
+              for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
+                  delete_subvolume_recursively "/btrfs_tmp/$i"
+              done
+              btrfs subvolume delete "$1"
+          }
+
+          for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +30); do
+              delete_subvolume_recursively "$i"
+          done
+
+          btrfs subvolume create /btrfs_tmp/root
+          umount /btrfs_tmp
+        '';
+      };
+    })
+    {
+      programs.fuse.userAllowOther = true;
+      environment.persistence = lib.mapAttrs' (_: v: {
         name = v.directory;
         value = {
           hideMounts = true;
           inherit (v) directories;
-          users = lib.genAttrs cfg.userNames (_: {
-            inherit (v.users) files directories;
-          });
+          users = lib.genAttrs cfg.userNames
+            (_: { inherit (v.users) files directories; });
         };
-      })
-      {
-        inherit (cfg) cache state;
-      };
-    boot.initrd.systemd.services.rollback = lib.mkMerge [
-      {
-        wantedBy = ["initrd.target"];
-        before = [
-          "initrd-root-fs.target"
-          "sysroot-var-lib-nixos.mount"
-        ];
-        after = ["sysroot.mount"];
-        unitConfig.DefaultDependencies = "no";
-        serviceConfig.Type = "oneshot";
-      }
-      (
-        lib.mkIf cfg.rollbacks.btrfs.enable {
-          description = "Simplified Rollback BTRFS root subvolume to a pristine state";
-          script = ''
-            mkdir -p /btrfs_tmp
-            mount ${cfg.device} -o subvol=/ /btrfs_tmp
-
-            # Backup and rotate the /root subvolume
-            if [[ -e /btrfs_tmp/root ]]; then
-                mkdir -p /btrfs_tmp/old_roots
-                timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
-                mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
-            fi
-
-            # Function to recursively delete old subvolumes
-            delete_subvolume_recursively() {
-                IFS=$'\n'
-                for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
-                    delete_subvolume_recursively "/btrfs_tmp/$i"
-                done
-                btrfs subvolume delete "$1"
-            }
-
-            # Remove /root backups older than 14 days
-            for backup in /btrfs_tmp/old_roots/*; do
-                if [[ -d "$backup" && $(find "$backup" -maxdepth 0 -mtime +14) ]]; then
-                  echo "deleting $backup"
-                    delete_subvolume_recursively "$backup"
-                fi
-            done
-
-            # Create a fresh /root subvolume
-            btrfs subvolume create /btrfs_tmp/root
-            echo "Created fresh /root subvolume"
-
-
-            # Unmount /btrfs_tmp after completing operations
-            umount /btrfs_tmp
-          '';
-        }
-      )
-    ];
-  };
+      }) { inherit (cfg) cache state; };
+    }
+  ];
 }
