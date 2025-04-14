@@ -10,6 +10,7 @@ in {
     easy-hosts = {
       functionsList = [
         (x: eval x)
+        (x: { modules = [{ _module.args.class = x.class; }]; })
         (x:
           let facter = flakeRoot + "/vars/${x._hostName}/facter.json";
           in {
