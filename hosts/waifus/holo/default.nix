@@ -7,6 +7,7 @@
           homeImport.enable = true;
           impermanance.enable = true;
           stylix.enable = true;
+          matugen.enable = true;
         };
       };
       nixpkgs.pkgs = import inputs.nixpkgs {
