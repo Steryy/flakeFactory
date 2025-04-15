@@ -7,6 +7,7 @@
         default = [ ];
       };
       exposedServices = lib.mkOption {
+        default = { };
         type = lib.types.attrsOf (lib.types.submodule {
           options = {
             port = lib.mkOption {

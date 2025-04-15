@@ -1,23 +1,22 @@
 {
   importer = {
     inputs = {
-      impermanance = true;
-      stylix = true;
+      impermanance.enable = true;
+      stylix.enable = true;
     };
     homeProfiles = {
-      hyprland = true;
-      xdgUserDirs = true;
-      zsh = true;
-      gpg = true;
-      rofi = true;
+      xdgUserDirs.enable = true;
+      zsh.enable = true;
+      gpg.enable = true;
+      rofi.enable = true;
 
-      git.default = true;
+      git.default.enable = true;
       programs = {
-        ghostty = true;
-        lazygit = true;
-        minecraft = true;
-        thunderbird = true;
-        vesktop = true;
+        ghostty.enable = true;
+        lazygit.enable = true;
+        minecraft.enable = true;
+        thunderbird.enable = true;
+        vesktop.enable = true;
       };
     };
   };

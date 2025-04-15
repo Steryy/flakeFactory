@@ -12,15 +12,12 @@
       };
     };
 
+    nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     haumea = {
-      inputs = {
-        nixpkgs = {
-          follows = "nixpkgs";
-        };
-      };
+      inputs = { nixpkgs = { follows = "nixpkgs"; }; };
       owner = "nix-community";
       repo = "haumea";
       type = "github";

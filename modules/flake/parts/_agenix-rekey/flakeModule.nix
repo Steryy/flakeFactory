@@ -14,9 +14,9 @@ in {
   easy-hosts.functionsList = [
     (x:
       let
-        secDir = flakeRoot + "/vars/${x._hostName}";
+        secDir = flakeRoot + "/vars/${x._hostName}/secrets";
         commonConf = {
-          masterIdentities = [{ identity = "/run/secrets/privkey.age"; }];
+          masterIdentities = [{ identity = "/persist/secrets/privkey.age"; }];
           storageMode = "local";
         };
       in if x._secrets then {
@@ -31,14 +31,20 @@ in {
                     inputs.agenix-rekey.homeManagerModules.default
                     inputs.agenix.homeManagerModules.age
                   ];
-                  age.rekey =
-                    let secretDir = secDir + "/users/${config.home.username}";
-                    in commonConf // {
-                      generatedSecretsDir = secretDir + "/generated";
+                  age.rekey = let
+                    secretDir = secDir
+                      + "/users/${config.home.username}/secrets";
+                    key = secretDir + "/../pubkey.txt";
+                  in commonConf // {
 
-                      secretsDir = secretDir + "/secrets";
-                      localStorageDir = secretDir + "/local";
-                    };
+                    hostPubkey = lib.throwIfNot (lib.pathExists key)
+                      "${config.home.username} dont have public key set"
+                      (lib.readFile key);
+                    generatedSecretsDir = secretDir + "/generated";
+
+                    secretsDir = secretDir;
+                    localStorageDir = secretDir + "/local";
+                  };
                 })
               ];
             };
@@ -49,11 +55,11 @@ in {
           })
           {
             # age.identityPaths
-            age.rekey = let key = secDir + "/pubkey.txt";
+            age.rekey = let key = secDir + "/../pubkey.txt";
             in commonConf // {
               generatedSecretsDir = secDir + "/generated";
 
-              secretsDir = secDir + "/secrets";
+              secretsDir = secDir;
               localStorageDir = secDir + "/local";
               hostPubkey = lib.throwIfNot (lib.pathExists key)
                 "${x._hostName} dont have public key set" (lib.readFile key);
