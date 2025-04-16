@@ -1,2 +1,0 @@
-: 1743950009:0;nixos-rebuild dry-build --flake .#waifus-holo
-: 1743950016:0;cd ../..
