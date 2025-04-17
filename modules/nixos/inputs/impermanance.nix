@@ -57,7 +57,7 @@ in {
 
     cache = dirDef {
       dir = "/persist/@cache";
-      userDirs = [ ".ssh" ".local/state/nix" ];
+      userDirs = [ ".ssh" ".local/state/nix" ".cache" ];
     };
     userNames = lib.mkOption {
       type = lib.types.listOf lib.types.str;
