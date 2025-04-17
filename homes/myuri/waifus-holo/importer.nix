@@ -9,6 +9,7 @@
       zsh.enable = true;
       gpg.enable = true;
       rofi.enable = true;
+      hyprland.enable = true;
 
       git.default.enable = true;
       programs = {

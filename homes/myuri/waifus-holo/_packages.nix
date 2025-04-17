@@ -1,34 +1,18 @@
-{
-  pkgs,
-  inputs,
-  ...
-}: let
+{ pkgs, inputs, ... }:
+let
   # inherit (inputs.cells.repo.functions) getHosts;
   # hosts = getHosts inputs;
 in {
   programs = {
     lazygit.enable = true;
     zsh.enable = true;
-    cmus = {
-      enable = true;
-    };
-    fd = {
-      enable = true;
-    };
-    btop.enable =
-      true;
-    bat = {
-      enable = true;
-    };
-    jqp = {
-      enable = true;
-    };
-    gitui = {
-      enable = true;
-    };
-    mangohud = {
-      enable = true;
-    };
+    cmus = { enable = true; };
+    fd = { enable = true; };
+    btop.enable = true;
+    bat = { enable = true; };
+    jqp = { enable = true; };
+    gitui = { enable = true; };
+    mangohud = { enable = true; };
 
     ssh = {
       enable = true;
@@ -38,13 +22,13 @@ in {
   };
   xdg.mime.fileManagers = [
     "Nautilus.desktop"
-    "Dolphin.desktop"
+    # "Dolphin.desktop"
   ];
   home = {
     packages = with pkgs; [
       chromium
       firefox
-      dolphin
+      # dolphin
       nautilus
       ripgrep
       ripgrep-all
@@ -60,8 +44,6 @@ in {
       pwvucontrol
 
       waybar
-      inputs.nur.legacyPackages."${pkgs.system}".repos.zzzsy.zen-browser
-      inputs.nixpkgs-stable.legacyPackages."${pkgs.system}".bitwarden-cli
     ];
   };
 }
