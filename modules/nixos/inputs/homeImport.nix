@@ -1,4 +1,4 @@
-{ inputs, config, lib, flakeRoot, homeModules, class, ... }:
+{ inputs, config, lib, flakeRoot, homeModules, tags, ... }:
 let
   hn = config.networking.hostName;
   dir = flakeRoot + "/homes";
@@ -34,12 +34,20 @@ let
         }];
         importerModules = (eval {
           inherit modules;
-          inherit class;
+          inherit tags;
         });
 
       in { imports = modules ++ importerModules.modules; }))
   ];
 in {
   imports = [ inputs.home-manager.nixosModules.home-manager ];
-  config = { home-manager = { inherit users; }; };
+  config = {
+    home-manager = {
+      backupFileExtension = "backupe";
+      sharedModules =
+        [{ nix.settings.experimental-features = [ "nix-command" "flakes" ]; }];
+      extraSpecialArgs = { inherit flakeRoot inputs; };
+      inherit users;
+    };
+  };
 }
