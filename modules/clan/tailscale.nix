@@ -15,7 +15,7 @@ with types; {
     };
 
     # Maps over all instances and produces one result per instance.
-    perInstance = { instanceName, settings, machine, roles, ... }:
+    perInstance = { settings, roles, ... }:
       let
 
         allControllerNames = lib.attrNames roles.headscale.machines;
@@ -56,7 +56,6 @@ with types; {
                 lib.concatStringsSep "," settings.advertised-rotes
               }"
             ]);
-            # map (x: "--advertise-routes=${exposedIps}") settings.advertised-rotes;
           };
 
         };
@@ -97,6 +96,4 @@ with types; {
     };
   };
 
-  # Maps over all machines and produces one result per machine.
-  # ...
 }
