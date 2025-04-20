@@ -12,8 +12,10 @@
       rofi.enable = true;
       hyprland.enable = true;
 
-      git.default.enable = true;
+      git.enable = true;
       programs = {
+        librewolf.enable = true;
+        starship.enable = true;
         ghostty.enable = true;
         lazygit.enable = true;
         minecraft.enable = true;

@@ -63,6 +63,10 @@
         };
         homeModules = {
           src = ./modules/home;
+          _pipe = [
+            (lib.attrsets.mapAttrsRecursiveCond (x: !(x ? "default"))
+              (_: v: if v ? "default" then v.default else v))
+          ];
         };
         diskoModules = {
           src = ./modules/disko;
