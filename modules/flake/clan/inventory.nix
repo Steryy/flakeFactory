@@ -1,15 +1,21 @@
 { lib, ... }: {
   clan = {
     inventory = {
+      instances = {
+        "tailscaleClient" = {
+          module.name = "tailscale";
+          roles.client.tags = {
+            # Right side needs to be an attribute set. Its purpose will become clear later
+            all = { };
+          };
+
+        };
+      };
       services = {
         user-password.default = { roles.default.tags = [ "all" ]; };
-
+        state-version.default = { roles.default.tags = [ "all" ]; };
         importer = {
 
-          # all.roles.default = {
-          #   tags = [ "all" ];
-          #   extraModules = [{ networking.domain = "tail4c5d3.ts.net"; }];
-          # };
           waifus.roles.default = {
             tags = [ "waifus" ];
             extraModules = [{ _module.args.system = "x86_64-linux"; }];
