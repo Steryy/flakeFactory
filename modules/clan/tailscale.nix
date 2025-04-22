@@ -22,14 +22,51 @@ with types; {
         first = head allControllerNames;
         controller = roles.headscale."${first}";
       in {
-        nixosModule = { config, ... }: {
-          clan.core.vars.generators.tailscale = {
-            prompts.authToken.description = "the root user's password";
-            prompts.authToken.type = "hidden";
-            prompts.authToken.persist = true;
-            script = ''
-              cat $prompts/authToken 
-            '';
+        nixosModule = { config, ... }:
+          let
+            keyType =
+              config.clan.core.vars.generators.tailscale.files.type.value;
+          in {
+            clan.core = {
+              state.tailscale.folders = [ "/var/lib/tailscale" ];
+              vars.generators.tailscale = {
+                files = { type = { secret = false; }; };
+                prompts.authToken.description = "Put tailscale key";
+                prompts.authToken.type = "hidden";
+                prompts.authToken.persist = true;
+                script = ''
+                  cut -d'-' -f1,2  < "$prompts/authToken"  | tr -d '\n' > "$out/type"
+                '';
+              };
+            };
+            networking.firewall = { trustedInterfaces = [ "tailscale0" ]; };
+
+            services.tailscale = {
+              enable = true;
+              openFirewall = true;
+              inherit (settings) useRoutingFeatures;
+              authKeyFile =
+                config.clan.core.vars.generators.tailscale.files.authToken.path;
+              # config.age.secrets.tailscaleAuth.path;
+              authKeyParameters = {
+                preauthorized =
+                  if elem keyType [ "tskey-client" ] then true else null;
+                ephemeral =
+                  if elem keyType [ "tskey-client" ] then true else null;
+              };
+
+              extraUpFlags = [ "--accept-routes" ]
+                ++ lib.optional (length allControllerNames == 1) [
+                  "--login-server=${controller.settings.publicUrl}"
+
+                ] ++ (lib.optional (settings.advertised-rotes != [ ]) [
+                  "--advertise-routes=${
+                    lib.concatStringsSep "," settings.advertised-rotes
+                  }"
+                ]);
+              # map (x: "--advertise-routes=${exposedIps}") settings.advertised-rotes;
+            };
+
           };
           networking.firewall = {
             checkReversePath = "loose";
