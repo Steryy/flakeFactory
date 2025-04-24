@@ -15,4 +15,9 @@ in {
   };
 
   imports = [ inputs.sops-nix.homeManagerModules.sops ];
+  config = lib.mkMerge [{
+    sops = {
+      age.keyFile = "${config.home.homeDirectory}/.ssh/keys/age.agekey";
+    };
+  }];
 }

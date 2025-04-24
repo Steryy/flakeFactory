@@ -1,9 +1,12 @@
 { pkgs, ... }:
 let
 in {
+  programs.gamemode.enable = true;
+  hardware.graphics.enable32Bit = true;
   environment.systemPackages = with pkgs; [
     (lutris.override {
       extraPkgs = pkgs: [
+        umu-launcher
         # List package dependencies here
 
         wine
@@ -13,6 +16,7 @@ in {
       ];
       extraLibraries = pkgs:
         [
+          umu-launcher
           # List library dependencies here
         ];
     })
