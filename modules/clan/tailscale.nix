@@ -8,9 +8,15 @@ with types; {
   roles.client = {
     interface = {
       # These options can be set via 'roles.client.settings'
-      options.advertised-rotes = mkOption {
-        type = listOf str;
-        default = [ ];
+      options = {
+        useRoutingFeatures = mkOption {
+          type = enum [ "client" "server" "both" ];
+          default = "client";
+        };
+        advertised-rotes = mkOption {
+          type = listOf str;
+          default = [ ];
+        };
       };
     };
 
@@ -18,7 +24,7 @@ with types; {
     perInstance = { settings, roles, ... }:
       let
 
-        allControllerNames = lib.attrNames roles.headscale.machines;
+        allControllerNames = lib.attrNames (roles.headscale.machines or { });
         first = head allControllerNames;
         controller = roles.headscale."${first}";
       in {
@@ -68,34 +74,6 @@ with types; {
             };
 
           };
-          networking.firewall = {
-            checkReversePath = "loose";
-            trustedInterfaces = [ "tailscale0" ];
-            allowedUDPPorts = [ config.services.tailscale.port ];
-          };
-
-          services.tailscale = {
-            enable = true;
-            openFirewall = true;
-            authKeyFile =
-              config.clan.core.vars.generators.tailscale.files.authToken.path;
-            # config.age.secrets.tailscaleAuth.path;
-            authKeyParameters = {
-              preauthorized = true;
-              ephemeral = true;
-            };
-
-            extraUpFlags = lib.optional (length allControllerNames == 1) [
-              "--login-server=${controller.settings.publicUrl}"
-
-            ] ++ (lib.optional (settings.advertised-rotes != [ ]) [
-              "--advertise-routes=${
-                lib.concatStringsSep "," settings.advertised-rotes
-              }"
-            ]);
-          };
-
-        };
       };
   };
   roles.headscale = {
@@ -107,7 +85,7 @@ with types; {
       # options.dynamicIp.enable = mkOption { type = bool; };
     };
     perInstance = { settings, ... }: {
-      nixosModule = { config, pkgs, ... }: {
+      nixosModule = { config, ... }: {
         services = {
           headscale = {
             enable = true;
