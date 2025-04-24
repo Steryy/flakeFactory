@@ -9,7 +9,7 @@ in {
       config = {
         format = "binary";
         sopsFile = flakeRoot
-          + "/vars/per-machines/${hostname}/per-user/${userName}/${name}/secret";
+          + "/vars/per-user/${userName}/${hostname}-${name}/secret";
       };
     }));
   };
