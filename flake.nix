@@ -16,6 +16,7 @@
       # New
       inputs.flake-parts.follows = "flake-parts";
     };
+    sops-nix.follows = "clan-core/sops-nix";
 
     nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
     home-manager.url = "github:nix-community/home-manager";

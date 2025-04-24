@@ -239,7 +239,11 @@
         "haumea": "haumea",
         "home-manager": "home-manager",
         "nixos-facter-modules": "nixos-facter-modules_2",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "sops-nix": [
+          "clan-core",
+          "sops-nix"
+        ]
       }
     },
     "sops-nix": {

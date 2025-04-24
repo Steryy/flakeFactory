@@ -3,6 +3,7 @@
     inputs = {
       impermanance.enable = true;
       stylix.enable = true;
+      sops-nix.enable = true;
     };
     homeProfiles = {
       xdgUserDirs.enable = true;
