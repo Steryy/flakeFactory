@@ -49,22 +49,15 @@ in {
     inherit specialArgs;
     # specialArgs = { inherit flakeRoot inputs; };
     machines = lib.mapAttrs (n: v:
-      let
-        facter = flakeRoot + "/vars/per-machine/${n}/facter.json";
-        fe = v.importer or { };
-        addModules = [{ _module.args = { inherit (v) tags; }; }]
-          ++ (lib.optional (lib.pathExists facter) [
-            inputs.nixos-facter-modules.nixosModules.facter
-            { config.facter.reportPath = facter; }
-          ]);
+      let fe = v.importer or { };
 
       in if fe == { } then {
-        imports = (eval v).modules ++ addModules;
+        imports = (eval v).modules;
       } else {
         imports = (eval {
           inherit (v) tags;
           modules = [ fe ];
-        }).modules ++ v.modules ++ addModules;
+        }).modules ++ v.modules;
       }) le;
 
     inventory = {
