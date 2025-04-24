@@ -7,10 +7,16 @@
       type = "github";
       owner = "hercules-ci";
       repo = "flake-parts";
-      inputs = {
-        nixpkgs-lib = {follows = "nixpkgs";};
-      };
+      inputs = { nixpkgs-lib = { follows = "nixpkgs"; }; };
     };
+    clan-core = {
+      url = "git+https://git.clan.lol/clan/clan-core";
+      inputs.nixpkgs.follows =
+        "nixpkgs"; # Needed if your configuration uses nixpkgs unstable.
+      # New
+      inputs.flake-parts.follows = "flake-parts";
+    };
+    sops-nix.follows = "clan-core/sops-nix";
 
     nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
     home-manager.url = "github:nix-community/home-manager";
@@ -21,11 +27,6 @@
       owner = "nix-community";
       repo = "haumea";
       type = "github";
-    };
-    easy-hosts = {
-      type = "github";
-      owner = "tgirlcloud";
-      repo = "easy-hosts";
     };
     disko = {
       inputs.nixpkgs.follows = "nixpkgs";
@@ -62,10 +63,15 @@
         };
         homeModules = {
           src = ./modules/home;
+          _pipe = [
+            (lib.attrsets.mapAttrsRecursiveCond (x: !(x ? "default"))
+              (_: v: if v ? "default" then v.default else v))
+          ];
         };
         diskoModules = {
           src = ./modules/disko;
         };
+        clanServices = { src = ./modules/clan; };
       };
       imports =
         flakeModules;

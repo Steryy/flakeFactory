@@ -1,29 +1,20 @@
-{
-  lib,
-  config,
-  ...
-}:
+{ lib, config, ... }:
 # {diskoLuks ? {}}:
 let
-  conf = config.diskoLuksBtrfs;
+  conf = config.diskoTemplate;
   # conf = diskoLuks;
 in {
-  options = {
-    diskoLuksBtrfs = lib.mkOption {
-      type = lib.types.attrs;
-    };
-  };
+  options = { diskoTemplate = lib.mkOption { type = lib.types.attrs; }; };
   config = {
-    disko.devices =
-      builtins.mapAttrs (n: cfg: let
+    disko.devices = builtins.mapAttrs (n: cfg:
+      let
         # cdev = cfg.label;
         keyFile = lib.head cfg.keyFiles;
         rest = lib.tail cfg.keyFiles;
 
-        passFile =
-          cfg.passFile;
+        passFile = cfg.passFile;
         keyFileSize = cfg.keyFileSize;
-        labels = map (x: "${n}${x}") cfg.labels;
+        labels = map (x: "${x}") cfg.labels;
         bootLabel = lib.lists.elemAt labels 0;
         luksLabel = lib.lists.elemAt labels 1;
         mapperLabel = lib.lists.elemAt labels 2;
@@ -45,7 +36,7 @@ in {
                   type = "filesystem";
                   format = "vfat";
                   mountpoint = "/boot";
-                  mountOptions = ["umask=0077"];
+                  mountOptions = [ "umask=0077" ];
                 };
               };
               luks = {
@@ -71,26 +62,23 @@ in {
                   content = {
                     type = "${cfg.fsType}";
 
-                    extraArgs = ["-L" "nixos" "-f"];
-                    subvolumes =
-                      cfg.additionalMount
-                      // {
-                        "${cfg.root}" = {
-                          mountpoint = "/";
-                          mountOptions = ["compress=zstd" "noatime"];
-                        };
-                        "@nix" = {
-                          mountpoint = "/nix";
-                          mountOptions = ["compress=zstd" "noatime"];
-                        };
+                    extraArgs = [ "-L" "nixos" "-f" ];
+                    subvolumes = cfg.additionalMount // {
+                      "${cfg.root}" = {
+                        mountpoint = "/";
+                        mountOptions = [ "compress=zstd" "noatime" ];
                       };
+                      "@nix" = {
+                        mountpoint = "/nix";
+                        mountOptions = [ "compress=zstd" "noatime" ];
+                      };
+                    };
                   };
                 };
               };
             };
           };
         };
-      })
-      conf;
+      }) conf;
   };
 }

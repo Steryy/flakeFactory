@@ -1,22 +1,14 @@
-{
-  pkgs,
-  config,
-  ...
-}: let
-  agentTimeout = 60 * 60 * 39;
+{ pkgs, config, ... }:
+let agentTimeout = 60 * 60 * 39;
 in {
   services.gpgUnlock = {
-    envfile =
-      config.age.secrets."gpg.env".path;
+    envfile = config.sops.secrets."gpg.env".path;
     enable = true;
   };
-systemd.user.services.gpgunlock.Unit.After = ["agenix.service"];
-  age.secrets = {
-    "gpg.env" = {};
-  };
-  home.packages = [
-    pkgs.gnupg
-  ];
+  systemd.user.services.gpgunlock.Unit.After = [ "sops-nix.service" ];
+  home.packages = [ pkgs.gnupg ];
+
+  sops.secrets = { "gpg.env" = { }; };
   services = {
     gpg-agent = {
       enable = true;

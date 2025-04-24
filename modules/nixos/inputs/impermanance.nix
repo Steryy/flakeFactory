@@ -57,7 +57,7 @@ in {
 
     cache = dirDef {
       dir = "/persist/@cache";
-      userDirs = [ ".ssh" ".local/state/nix" ];
+      userDirs = [ ".ssh" ".local/state/nix" ".cache" ];
     };
     userNames = lib.mkOption {
       type = lib.types.listOf lib.types.str;
@@ -70,20 +70,6 @@ in {
   };
   imports = [ inputs.impermanence.nixosModules.impermanence ];
   config = lib.mkMerge [
-    { fileSystems."/persist".neededForBoot = true; }
-    (lib.optionalAttrs (options ? "age") {
-      services.openssh.hostKeys = [
-        {
-          path = cfg.state.directory + "/etc/ssh/ssh_host_rsa_key";
-          type = "rsa";
-          bits = 4096;
-        }
-        {
-          path = cfg.state.directory + "/etc/ssh/ssh_host_ed25519_key";
-          type = "ed25519";
-        }
-      ];
-    })
     {
 
       boot.initrd.systemd.services.clean = {
@@ -102,7 +88,7 @@ in {
         description = "Rollback BTRFS root subvolume to a pristine state";
         script = ''
           mkdir /btrfs_tmp
-          mount ${cfg.device} -o btrfs /btrfs_tmp
+          mount ${cfg.device} -t btrfs /btrfs_tmp
           if [[ -e /btrfs_tmp/root ]]; then
               mkdir -p /btrfs_tmp/old_roots
               timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")

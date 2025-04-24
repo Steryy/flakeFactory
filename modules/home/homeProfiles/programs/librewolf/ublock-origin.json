@@ -1,0 +1,39 @@
+{
+  "timeStamp": 1741279597200,
+  "version": "1.62.0",
+  "userSettings": {
+    "externalLists": "https://easylist.to/easylist/easylist.txt\nhttps://easylist.to/easylist/easyprivacy.txt\nhttps://secure.fanboy.co.nz/fanboy-annoyance.txt\nhttps://secure.fanboy.co.nz/fanboy-cookiemonster.txt",
+    "importedLists": [
+      "https://easylist.to/easylist/easylist.txt",
+      "https://easylist.to/easylist/easyprivacy.txt",
+      "https://secure.fanboy.co.nz/fanboy-annoyance.txt",
+      "https://secure.fanboy.co.nz/fanboy-cookiemonster.txt"
+    ]
+  },
+  "selectedFilterLists": [
+    "user-filters",
+    "ublock-filters",
+    "ublock-badware",
+    "ublock-privacy",
+    "ublock-unbreak",
+    "ublock-quick-fixes",
+    "easylist",
+    "easyprivacy",
+    "urlhaus-1",
+    "plowe-0",
+    "https://raw.githubusercontent.com/yokoffing/filterlists/main/annoyance_list.txt",
+    "https://gitflic.ru/project/magnolia1234/bypass-paywalls-clean-filters/blob/raw?file=bpc-paywall-filter.txt",
+    "https://easylist.to/easylist/easylist.txt",
+    "https://secure.fanboy.co.nz/fanboy-cookiemonster.txt",
+    "https://secure.fanboy.co.nz/fanboy-annoyance.txt",
+    "https://easylist.to/easylist/easyprivacy.txt"
+  ],
+  "hiddenSettings": {},
+  "whitelist": [
+    "chrome-extension-scheme"
+  ],
+  "dynamicFilteringString": "behind-the-scene * * noop\nbehind-the-scene * inline-script noop\nbehind-the-scene * 1p-script noop\nbehind-the-scene * 3p-script noop\nbehind-the-scene * 3p-frame noop\nbehind-the-scene * image noop\nbehind-the-scene * 3p noop",
+  "urlFilteringString": "",
+  "hostnameSwitchesString": "no-large-media: behind-the-scene false\nno-csp-reports: * true",
+  "userFilters": ""
+}

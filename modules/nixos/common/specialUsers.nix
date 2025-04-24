@@ -1,29 +1,23 @@
 { lib, config, options, ... }:
 let
-  cfg = config.common.specialUser;
+  cfg = config.clan.user-password.user;
   groupsExists = groups:
     lib.filter (g: lib.hasAttr g config.users.groups) groups;
 in {
-  options.common.specialUser = lib.mkOption { type = lib.types.str; };
 
   config = lib.mkMerge [
     (lib.optionalAttrs (options ? "persistence") {
       persistence.userNames = [ cfg ];
     })
-    (lib.optionalAttrs (!(options ? "age")) {
-      users.users."${cfg}".initialPassword = "changeme";
-    })
-    (lib.optionalAttrs (options ? "age") {
-      age = { secrets = { "${cfg}password" = { }; }; };
-      users.users = { root.initialPassword = "changeme"; };
-      users.users."${cfg}".hashedPasswordFile =
-        config.age.secrets."${cfg}password".path;
-    })
     {
+
+      security.sudo.wheelNeedsPassword = false;
+      nix.settings.trusted-users = [ "@wheel" cfg ];
       users.users."${cfg}" = {
+        uid = 1000;
         isNormalUser = true;
         openssh.authorizedKeys.keys =
-          config.users.root.openssh.authorizedKeys.keys;
+          config.users.users.root.openssh.authorizedKeys.keys;
         extraGroups = [ "wheel" "nix" ] ++ groupsExists [
           "network"
           "networkmanager"
