@@ -4,6 +4,7 @@
   ...
 }: {
   boot = {
+    tmp.useTmpfs = true;
     kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
     loader = {
       efi.canTouchEfiVariables = true;
