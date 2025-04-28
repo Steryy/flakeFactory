@@ -1,0 +1,1 @@
+{ ... }: { programs.anyrun = { enable = true; }; }
