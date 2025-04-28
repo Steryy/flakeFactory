@@ -4,9 +4,17 @@
       instances = {
         "tailscaleClient" = {
           module.name = "tailscale";
-          roles.client.tags = {
-            # Right side needs to be an attribute set. Its purpose will become clear later
-            all = { };
+          roles.client = {
+            tags = {
+              # Right side needs to be an attribute set. Its purpose will become clear later
+              all = { };
+            };
+            machines = {
+              villainess-claire.settings = {
+                useRoutingFeatures = "both";
+                advertised-rotes = [ "192.168.1.30/32" "192.168.1.1/32" ];
+              };
+            };
           };
 
         };

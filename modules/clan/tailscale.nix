@@ -62,14 +62,13 @@ with types; {
               };
 
               extraUpFlags = [ "--accept-routes" ]
-                ++ lib.optional (length allControllerNames == 1) [
-                  "--login-server=${controller.settings.publicUrl}"
+                ++ lib.optional (length allControllerNames == 1)
+                "--login-server=${controller.settings.publicUrl}"
 
-                ] ++ (lib.optional (settings.advertised-rotes != [ ]) [
+                ++ (lib.optional (settings.advertised-rotes != [ ])
                   "--advertise-routes=${
                     lib.concatStringsSep "," settings.advertised-rotes
-                  }"
-                ]);
+                  }");
               # map (x: "--advertise-routes=${exposedIps}") settings.advertised-rotes;
             };
 
