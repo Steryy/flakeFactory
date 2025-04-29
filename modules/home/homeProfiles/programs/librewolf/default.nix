@@ -1,8 +1,8 @@
 { pkgs, lib, options, inputs, config, ... }:
 let
   args = { inherit pkgs lib inputs config; };
-  settings = import ./_settings.nix args;
-  floorpsettings = import ./_floorpsettings.nix args;
+  settings = import ./_settings.nix;
+  floorpsettings = import ./_floorpsettings.nix;
   extensions = import ./_extensions.nix args;
   sett = lib.recursiveUpdate settings floorpsettings;
 
@@ -14,6 +14,14 @@ let
   };
 in {
   config = lib.mkMerge [
+    (lib.optionalAttrs (options ? "stylix") {
+      stylix.targets.librewolf = {
+        colorTheme.enable = true;
+        profileNames = [ "default" ];
+      };
+
+    })
+
     (lib.optionalAttrs (options ? "persistence") {
       persistence.cache.directories = [ ".librewolf" ];
     })

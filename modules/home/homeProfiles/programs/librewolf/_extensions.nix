@@ -4,13 +4,18 @@ let
   impJ = file: builtins.fromJSON (builtins.readFile file);
   ext =
     with inputs.nur.legacyPackages."${pkgs.system}".repos.rycee.firefox-addons; [
-      disable-facebook-news-feed
-      playback-speed
       tridactyl
       shinigami-eyes
 
       darkreader
       bitwarden
+      buster-captcha-solver
+      british-english-dictionary-2
+      polish-dictionary
+      privacy-badger
+      return-youtube-dislikes
+      multi-account-containers
+      istilldontcareaboutcookies
 
       {
         package = sponsorblock;
