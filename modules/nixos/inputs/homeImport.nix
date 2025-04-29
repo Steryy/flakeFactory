@@ -1,4 +1,4 @@
-{ inputs, config, lib, flakeRoot, homeModules, tags, ... }:
+{ inputs, config, lib, flakeRoot, homeModules, tags, options, ... }:
 let
   hn = config.networking.hostName;
   dir = flakeRoot + "/homes";
@@ -20,18 +20,21 @@ let
     (lib.filterAttrs (_: v: v != { }))
     (lib.mapAttrs (n: _:
       let
-        modules = [{
-          imports = [
-            {
-              home = lib.mkDefault {
-                username = n;
-                homeDirectory = "/home/${n}";
-                stateVersion = "25.05";
-              };
-            }
-            "${dir}/${n}/${hn}/default.nix"
-          ];
-        }];
+        modules = [
+          { importer.inputs.impermanance.enable = (options ? "persistence"); }
+          {
+            imports = [
+              {
+                home = lib.mkDefault {
+                  username = n;
+                  homeDirectory = "/home/${n}";
+                  stateVersion = "25.05";
+                };
+              }
+              "${dir}/${n}/${hn}/default.nix"
+            ];
+          }
+        ];
         importerModules = (eval {
           inherit modules;
           inherit tags;
@@ -43,6 +46,7 @@ in {
   imports = [ inputs.home-manager.nixosModules.home-manager ];
   config = {
     home-manager = {
+      useGlobalPkgs = true;
       backupFileExtension = "backupe";
       sharedModules =
         [{ nix.settings.experimental-features = [ "nix-command" "flakes" ]; }];
