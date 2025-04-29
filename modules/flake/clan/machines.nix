@@ -63,7 +63,10 @@ in {
     inventory = {
       services.importer.all.roles.default = {
         tags = [ "all" ];
-        extraModules = [{ networking.domain = domain; }];
+        extraModules = [{
+          networking.domain = domain;
+          clan.core.networking.buildHost = "localhost";
+        }];
       };
       machines = lib.mapAttrs (n: v:
         (lib.removeAttrs v [ "modules" ]) // {
