@@ -6,45 +6,37 @@
   options,
   ...
 }: let
-  adjustLightness = primaryScale: rgbColorString: let
-    values = builtins.split "," (
-      builtins.replaceStrings ["rgb(" ")"] ["" ""] rgbColorString
-    );
-    preLightness =
-      (
-        (builtins.fromJSON (builtins.elemAt values 0))
-        + (builtins.fromJSON (builtins.elemAt values 2))
-        + (builtins.fromJSON (builtins.elemAt values 4))
-      )
-      / 3.0;
-    adj =
-      (preLightness / 255.0 * (1.0 - primaryScale) + primaryScale)
-      / preLightness
-      * 255.0;
-    round = x: let
-      floored = builtins.floor x;
-      diff = x - floored;
-    in
-      if diff >= 0.5
-      then floored + 1
-      else floored;
-    adjust = int:
-      lib.pipe int [
-        (lib.elemAt values)
-        builtins.fromJSON
-        (x: x * adj)
-        (lib.min 255.0)
-        (lib.max 0.0)
-        round
-        lib.toHexString
-        (lib.strings.fixedWidthString 2 "0")
-        toString
+  adjustLightness = primaryScale: rgbColorString:
+    let
+      values = builtins.split ","
+        (builtins.replaceStrings [ "rgb(" ")" ] [ "" "" ] rgbColorString);
+      rgb = map (x: builtins.fromJSON x) [
+        (builtins.elemAt values 0)
+        (builtins.elemAt values 2)
+        (builtins.elemAt values 4)
       ];
-    # lib.max (lib.min (lib.fromJSON (lib.elemAt values int) * adj) 255.0) 0.0;
-  in
-    (adjust 0)
-    + (adjust 2)
-    + (adjust 4);
+      adj = lib.pipe rgb [
+        (lib.foldl (acc: next: acc + next) 0)
+        (x: x / 3.0)
+        (lib.max 3.0)
+        (x: (x / 255.0 * (1.0 - primaryScale) + primaryScale) / x * 255.0)
+      ];
+      round = x:
+        let
+          floored = builtins.floor x;
+          diff = x - floored;
+        in if diff >= 0.5 then floored + 1 else floored;
+      adjust = int:
+        lib.pipe int [
+          (x: x * adj)
+          (lib.min 255.0)
+          (lib.max 0.0)
+          round
+          lib.toHexString
+          (lib.strings.fixedWidthString 2 "0")
+          toString
+        ];
+    in lib.strings.concatStringsSep "" (map (x: adjust x) rgb);
 in {
   imports = [
     inputs.stylix.nixosModules.stylix
