@@ -60,6 +60,25 @@
       haumea = {
         nixModules = {
           src = ./modules/nixos;
+      };
+        hosts = {
+          src = ./hosts;
+          loader = _: import;
+          _pipe = [
+            (lib.attrsets.mapAttrsRecursiveCond (x: !(x ? "default"))
+              (_: v: if v ? "default" then v.default else v))
+            (lib.mapAttrs (n:
+              lib.filterAttrs (n2: v:
+                if v ? "modules" then
+                  true
+                else
+                  throw "Host ${n}-${n2} doesnt have modules")))
+            (lib.mapAttrs (n:
+              lib.mapAttrs' (n2: value: {
+                inherit value;
+                name = "${n}-${n2}";
+              })))
+          ];
         };
         homeModules = {
           src = ./modules/home;

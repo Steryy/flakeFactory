@@ -2,32 +2,10 @@
 let
   domain = "tail4c5d3.ts.net";
 
-  l = lib // builtins;
-  dir = flakeRoot + "/hosts";
-  le = lib.pipe dir [
-    l.readDir
+  le = lib.pipe config.haumea.hosts [
 
-    (lib.mapAttrs (n: l.filterAttrs (_: v: v == "directory")))
-    (l.mapAttrs (n: _: dir + "/${n}"))
-    (lib.mapAttrs (_: builtins.readDir))
-    # (lib.mapAttrs (n: l.filterAttrs (_: v: v == "directory")))
-    (lib.mapAttrs (tag:
-      lib.mapAttrs' (n: _:
-        let
-          _path = dir + "/${tag}/${n}";
-          imported = import (if lib.pathIsDirectory _path then
-            "${_path}/default.nix"
-          else
-            _path);
-
-          name = builtins.concatStringsSep "-" [ tag n ];
-        in {
-          inherit name;
-          value = imported // {
-            deploy = imported.deploy or { };
-            tags = [ tag "all" ] ++ (imported.tags or [ ]);
-          };
-        })))
+    (lib.mapAttrs
+      (tag: lib.mapAttrs (_: v: v // { tags = (v.tags or [ ]) ++ [ tag ]; })))
     lib.attrValues
     (map (lib.attrsets.attrsToList))
     lib.flatten
@@ -39,24 +17,23 @@ let
 
   specialArgs = { inherit flakeRoot inputs homeModules; };
   eval = x:
-    (import (flakeRoot + "/lib/importer.nix") { inherit lib; }).eval (x // {
-      modules = (x.modules) ++ [{ _module.args = { inherit (x) tags; }; }];
-      importerModules = nixModules;
+    let modules = if lib.elem "nixos" x.tags then nixModules else null;
+    in (import (flakeRoot + "/lib/importer.nix") { inherit lib; }).eval (x // {
+      modules = (x.modules);
+      importerModules = modules;
       inherit specialArgs;
     });
 in {
   clan = {
     inherit specialArgs;
-    # specialArgs = { inherit flakeRoot inputs; };
     machines = lib.mapAttrs (n: v:
-      let fe = v.importer or { };
-
-      in if fe == { } then {
-        imports = (eval v).modules;
-      } else {
+      let tags = config.clan.inventory.machines.${n}.tags or [ ];
+      in {
         imports = (eval {
-          inherit (v) tags;
-          modules = [ fe ];
+          inherit tags;
+          modules = [{
+            config = { inherit (v) importer; };
+          }];
         }).modules ++ v.modules;
       }) le;
 
@@ -69,10 +46,12 @@ in {
         }];
       };
       machines = lib.mapAttrs (n: v:
-        (lib.removeAttrs v [ "modules" ]) // {
+        let user = v.deploy.adminUser or "root";
+        in {
+          inherit (v) tags;
+        } // {
           deploy = {
-            targetHost = let user = v.deploy.adminUser or "root";
-            in if v ? "deploy" && v.deploy ? "targetHost" then
+            targetHost = if v ? "deploy" && v.deploy ? "targetHost" then
               v.deploy.targetHost
             else
               "${user}@${n}.${domain}";
