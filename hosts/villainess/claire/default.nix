@@ -1,23 +1,20 @@
 let adminUser = "francois";
 in {
   deploy = { inherit adminUser; };
-  modules = [
-    {
-
-      importer = {
-        common.readOnlypkgs.enable = false;
-        services = {
-          hosted = {
-            forgejo.enable = true;
-            postgres.enable = true;
-            home-assistant.enable = true;
-            nextcloud.enable = true;
-            vaultwarden.enable = true;
-          };
-          acme.enable = true;
-        };
+  importer = {
+    common.readOnlypkgs.enable = false;
+    services = {
+      hosted = {
+        forgejo.enable = true;
+        postgres.enable = true;
+        home-assistant.enable = true;
+        nextcloud.enable = true;
+        vaultwarden.enable = true;
       };
-    }
+      acme.enable = true;
+    };
+  };
+  modules = [
     ({ pkgs, config, flakeRoot, ... }: {
       imports = [ (flakeRoot + "/modules/disko/ext4.nix") ];
       nixpkgs.hostPlatform = "x86_64-linux";
