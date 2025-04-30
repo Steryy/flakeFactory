@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ pkgs, osConfig, lib, ... }:
 let
   # inherit (inputs.cells.repo.functions) getHosts;
   # hosts = getHosts inputs;
@@ -16,34 +16,31 @@ in {
 
     ssh = {
       enable = true;
+      matchBlocks = lib.mapAttrs' (_: v:
+        let splited = lib.strings.splitString "@" v.deploy.targetHost;
+        in {
+          name = v.name;
+          value = {
+            user = lib.elemAt splited 0;
+            hostname = lib.elemAt splited 1;
+          };
+        }) osConfig.clan.inventory.machines;
       # matchBlocks =
       #   hosts;
     };
   };
-  xdg.mime.fileManagers = [
-    "Nautilus.desktop"
-    # "Dolphin.desktop"
-  ];
   home = {
     packages = with pkgs; [
+      wl-clipboard-rs
       chromium
       firefox
-      # dolphin
       nautilus
       ripgrep
       ripgrep-all
       blueman
       nsxiv
-      # nexusmods-app-unfree
-      # (nexusmods-app.override {
-      #   _7zz = _7zz-rar;
-      # })
-      # nexusmods-app
-
       coppwr
       pwvucontrol
-
-      waybar
     ];
   };
 }
