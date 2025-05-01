@@ -1,23 +1,26 @@
 { config, lib, ... }:
 let
-  tag = lib.lists.remove [ "all" "nixos" ] config.clan.inventory.tags;
+  tag =
+    lib.filter (x: !lib.elem x [ "all" "nixos" ]) config.clan.inventory.tags;
   serverProviders = [ "villainess" "shou" "seirei" ];
   isKami = lib.elem "kami" tag;
   factions = (lib.filter (x: lib.hasPrefix "faction-" x) tag);
-  faction = lib.head factions;
   gatherFactions = lib.pipe config.clan.inventory.machines [
-    (lib.filterAttrs (_: v: lib.elem faction v.tags))
+    (lib.filterAttrs (_: v:
+      let
+        len = lib.length factions;
+        faction = lib.head factions;
+      in if len == 1 then lib.elem faction v.tags else false))
     (lib.filterAttrs (_: v: lib.elem "shikikan" v.tags))
     lib.attrValues
     lib.length
   ];
 in {
-  assertions = [{
-
-    assertion = isKami == (lib.length tag == 1);
+  assertions = (lib.optionals (isKami) [{
+    assertion = !(lib.any (x: lib.elem x tag)
+      (serverProviders ++ [ "senkan" "shikikan" ]));
     message = "Kami tags are only allowed on gui hosts";
-  }] ++ map (x: x // { assertion = x.assertion == !isKami; }) [
-
+  }]) ++ (lib.optionals (!isKami) [
     {
 
       assertion = lib.length (lib.filter (x: lib.elem x tag) serverProviders)
@@ -36,9 +39,8 @@ in {
     }
     {
       assertion =
-        lib.length (lib.filter (x: lib.elem x tag) [ "senkan" "shikikan" ])
-        != 2;
+        lib.length (lib.filter (x: lib.elem x tag) [ "senkan" "shikikan" ]) < 2;
       message = "Kubernetes controller cant be Kubernetes node";
     }
-  ];
+  ]);
 }
