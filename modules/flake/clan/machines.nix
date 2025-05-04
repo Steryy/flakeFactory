@@ -32,6 +32,18 @@ in {
         imports = (eval {
           inherit tags;
           modules = [{
+            options.clan.inventory = {
+              machines = lib.mkOption {
+                type = lib.types.attrs;
+                readOnly = true;
+                default = config.clan.inventory.machines;
+              };
+              tags = lib.mkOption {
+                type = lib.types.listOf lib.types.str;
+                readOnly = true;
+                default = tags;
+              };
+            };
             config = { inherit (v) importer; };
           }];
         }).modules ++ v.modules;
