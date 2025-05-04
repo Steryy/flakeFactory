@@ -20,7 +20,7 @@
         };
       };
       services = {
-        user-password.default = { roles.default.tags = [ "all" ]; };
+        user-password.default = { roles.default.tags = [ "kami" ]; };
         state-version.default = { roles.default.tags = [ "all" ]; };
         importer = {
 
@@ -29,18 +29,14 @@
             extraModules = [{ _module.args.system = "x86_64-linux"; }];
           };
         };
-        admin.all.roles.default = {
+        sshd.all.roles.server = {
           tags = [ "all" ];
-          config.allowedKeys = lib.pipe [
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdo5NQApszwHbzHhN1JxxulAa3YM9m2pDHhwfuFA78o (none)"
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEEGCUtdHT8bYJbQTr2V+GXvuLPCAmVEKeG8+uzOVGx steryy@waifu-holo"
-          ] [
-            (lib.lists.imap0 (name: value: {
-              inherit value;
-              name = toString name;
-            }))
-            (lib.listToAttrs)
-          ];
+          extraModules = [{
+            users.users.root.openssh.authorizedKeys.keys = [
+              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdo5NQApszwHbzHhN1JxxulAa3YM9m2pDHhwfuFA78o (none)"
+              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEEGCUtdHT8bYJbQTr2V+GXvuLPCAmVEKeG8+uzOVGx steryy@waifu-holo"
+            ];
+          }];
         };
 
       };
