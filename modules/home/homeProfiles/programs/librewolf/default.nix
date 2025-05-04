@@ -1,6 +1,6 @@
-{ pkgs, lib, options, inputs, config, ... }:
+{ pkgs, lib, options, extraInputs, config, ... }:
 let
-  args = { inherit pkgs lib inputs config; };
+  args = { inherit pkgs lib extraInputs config; };
   settings = import ./_settings.nix;
   floorpsettings = import ./_floorpsettings.nix;
   extensions = import ./_extensions.nix args;

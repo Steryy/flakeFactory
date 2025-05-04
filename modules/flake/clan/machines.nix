@@ -15,7 +15,8 @@ let
   nixModules = config.haumea.nixModules;
   homeModules = config.haumea.homeModules;
 
-  specialArgs = { inherit flakeRoot inputs homeModules; };
+  specialArgs = { inherit flakeRoot inputs homeModules; 
+    extraInputs = config.partitions.extraInputs.extraInputs; };
   eval = x:
     let modules = if lib.elem "nixos" x.tags then nixModules else null;
     in (import (flakeRoot + "/lib/importer.nix") { inherit lib; }).eval (x // {

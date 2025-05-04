@@ -2,13 +2,13 @@
   lib,
   config,
   osConfig,
-  inputs,
+  extraInputs,
   ...
 }: let
   homedir = config.home.homeDirectory;
 in {
   imports = [
-    inputs.impermanence.homeManagerModules.impermanence
+    extraInputs.impermanence.homeManagerModules.impermanence
   ];
   options = {
     persistence = let

@@ -1,4 +1,4 @@
-{ inputs, config, lib, flakeRoot, homeModules, options, ... }:
+{ extraInputs, config, lib, flakeRoot, homeModules, options, inputs, ... }:
 let
   hn = config.networking.hostName;
   dir = flakeRoot + "/homes";
@@ -21,8 +21,11 @@ let
     (lib.mapAttrs (n: _:
       let
         modules = [
-          { importer.inputs.impermanance.enable = (options ? "persistence"); }
+          (lib.optionalAttrs (options ? "stylix"){
+            importer.inputs.stylix.enable = lib.mkForce  false;
+          })
           {
+            importer.inputs.impermanance.enable = (options ? "persistence");
             imports = [
               {
                 home = lib.mkDefault {
@@ -43,14 +46,14 @@ let
       in { imports = modules ++ importerModules.modules; }))
   ];
 in {
-  imports = [ inputs.home-manager.nixosModules.home-manager ];
+  imports = [ extraInputs.home-manager.nixosModules.home-manager ];
   config = {
     home-manager = {
       useGlobalPkgs = true;
       backupFileExtension = "backupe";
       sharedModules =
         [{ nix.settings.experimental-features = [ "nix-command" "flakes" ]; }];
-      extraSpecialArgs = { inherit flakeRoot inputs; };
+      extraSpecialArgs = { inherit flakeRoot extraInputs inputs ;  }; 
       inherit users;
     };
   };
