@@ -21,8 +21,11 @@ let
     (lib.mapAttrs (n: _:
       let
         modules = [
-          { importer.inputs.impermanance.enable = (options ? "persistence"); }
+          (lib.optionalAttrs (options ? "stylix"){
+            importer.inputs.stylix.enable = lib.mkForce  false;
+          })
           {
+            importer.inputs.impermanance.enable = (options ? "persistence");
             imports = [
               {
                 home = lib.mkDefault {
