@@ -22,6 +22,11 @@ in {
               .directory)
             + "${homedir}";
         };
+        files = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default =[];
+
+        };
         directories = lib.mkOption {
           type = lib.types.listOf
             (lib.types.coercedTo lib.types.str (d: { directory = d; })
@@ -58,7 +63,7 @@ in {
       lib.mapAttrs' (_: v: {
         name = v.directory;
         value = {
-          inherit (v) directories;
+          inherit (v) directories files;
         };
       })
       config.persistence;
