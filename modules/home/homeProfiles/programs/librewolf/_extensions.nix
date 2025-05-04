@@ -1,9 +1,8 @@
-_:
-{ inputs, pkgs, lib, config, ... }:
+{ extraInputs, pkgs, lib,  ... }:
 let
   impJ = file: builtins.fromJSON (builtins.readFile file);
   ext =
-    with inputs.nur.legacyPackages."${pkgs.system}".repos.rycee.firefox-addons; [
+    with extraInputs.nur.legacyPackages."${pkgs.system}".repos.rycee.firefox-addons; [
       tridactyl
       shinigami-eyes
 

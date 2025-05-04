@@ -1,5 +1,5 @@
-{ config, inputs, pkgs, lib, options, ... }: {
-  imports = [ inputs.matugen.nixosModules.matugen ];
+{ extraInputs, config,  pkgs, lib, options, ... }: {
+  imports = [ extraInputs.matugen.nixosModules.matugen ];
   config = lib.mkMerge [
     {
 

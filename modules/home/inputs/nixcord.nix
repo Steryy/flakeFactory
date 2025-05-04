@@ -1,5 +1,5 @@
-{inputs, ...}: {
+{extraInputs, ...}: {
   imports = [
-    inputs.nixcord.homeManagerModules.nixcord
+    extraInputs.nixcord.homeManagerModules.nixcord
   ];
 }

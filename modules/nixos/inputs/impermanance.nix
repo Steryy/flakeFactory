@@ -1,4 +1,4 @@
-{ inputs, lib, config, options, ... }:
+{ extraInputs, lib, config, options, ... }:
 let
   cfg = config.persistence;
   # normalUsers = lib.attrNames (lib.filterAttrs (_: v: v.isNormalUser) config.users.users);
@@ -68,7 +68,7 @@ in {
     device = lib.mkOption { type = lib.types.str; };
     rollbacks = { btrfs = { enable = lib.mkEnableOption "btrfs rollback"; }; };
   };
-  imports = [ inputs.impermanence.nixosModules.impermanence ];
+  imports = [ extraInputs.impermanence.nixosModules.impermanence ];
   config = lib.mkMerge [
     {
 

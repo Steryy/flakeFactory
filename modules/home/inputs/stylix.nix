@@ -3,11 +3,12 @@
   inputs,
   pkgs,
   lib,
+  extraInputs,
   ...
 }: let
 in {
   imports = [
-    inputs.stylix.homeManagerModules.stylix
+    extraInputs.stylix.homeManagerModules.stylix
   ];
 
   home.pointerCursor = lib.mkForce {

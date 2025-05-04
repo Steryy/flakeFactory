@@ -1,6 +1,6 @@
 {
   lib,
-  inputs,
+extraInputs,
   pkgs,
   config,
   options,
@@ -39,7 +39,7 @@
     in lib.strings.concatStringsSep "" (map (x: adjust x) rgb);
 in {
   imports = [
-    inputs.stylix.nixosModules.stylix
+    extraInputs.stylix.nixosModules.stylix
   ];
   options.stylix.primaryScale = {
     dark = lib.mkOption {
@@ -125,7 +125,7 @@ in {
           size = 48;
         };
 
-        targets.qt.platform = "qtct";
+        targets.qt.platform = lib.mkForce "qtct";
         targets.qt.enable = true;
         targets.gtk.enable = true;
       };
