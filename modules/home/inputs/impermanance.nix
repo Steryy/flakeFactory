@@ -63,6 +63,7 @@ in {
       lib.mapAttrs' (_: v: {
         name = v.directory;
         value = {
+          allowOther = true;
           inherit (v) directories files;
         };
       })
