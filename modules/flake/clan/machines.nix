@@ -45,6 +45,7 @@ in {
               };
             };
             config = { 
+              _module.args.hostName = n;
               users.defaultUser = user;
               inherit (v) importer; };
           }];

@@ -1,32 +1,26 @@
-{ lib, ... }: {
+ {
   clan = {
     inventory = {
-      instances = {
-        "tailscaleClient" = {
-          module.name = "tailscale";
-          roles.client = {
-            tags = {
-              # Right side needs to be an attribute set. Its purpose will become clear later
-              all = { };
-            };
-            machines = {
-              villainess-claire.settings = {
-                useRoutingFeatures = "both";
-                advertised-rotes = [ "192.168.1.30/32" "192.168.1.1/32" ];
-              };
-            };
-          };
-
-        };
-      };
       services = {
-        user-password.default = { roles.default.tags = [ "kami" ]; };
-        state-version.default = { roles.default.tags = [ "all" ]; };
-        importer = {
-
-          waifus.roles.default = {
-            tags = [ "waifus" ];
-            extraModules = [{ _module.args.system = "x86_64-linux"; }];
+        user-password.default = {roles.default.tags = ["kami"];};
+        state-version.default = {roles.default.tags = ["all"];};
+        mycelium.default = {
+          roles.peer.tags = [
+            "kami"
+            "villainess"
+          ];
+        };
+        zerotier.default = {
+          roles = {
+            controller.machines = [
+              "shou-jeannette" 
+            ];
+            peer = {
+              tags = [
+                "kami"
+                "villainess" 
+              ];
+            };
           };
         };
         sshd.all.roles.server = {
