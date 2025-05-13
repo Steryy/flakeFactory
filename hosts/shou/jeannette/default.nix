@@ -14,7 +14,6 @@ in {
         systemdboot.enable = false;
       };
       packages.enable = false;
-      linkInputs.enable = false;
     };
   };
   modules = [

@@ -2,14 +2,15 @@
 {
   lib,
   config,
+  extraInputs,
   inputs,
   ...
 }: let
-  inherit (lib) mkIf filterAttrs mapAttrs' mkOption types mkEnableOption;
+  inherit (lib) mkIf filterAttrs mapAttrs'  mkEnableOption;
   mkTrueOption = description:
     (mkEnableOption description) // {default = true;};
 
-  flakes = filterAttrs (name: value: value ? outputs) inputs;
+  flakes = filterAttrs (name: value: value ? outputs) (inputs // extraInputs);
 
   nixRegistry =
     builtins.mapAttrs
