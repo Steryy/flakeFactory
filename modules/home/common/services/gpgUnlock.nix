@@ -15,6 +15,7 @@
           ${passp}   -P"$GPG_PASS" --preset "$key" &&  echo "Unlocking $key " || echo "Failed unlocking $key"
     done
   '';
+  servicename = "gpgunlock";
 in {
   options.services.gpgUnlock = {
     enable = lib.mkEnableOption "Automatic Unlocking of gpg";
@@ -22,15 +23,21 @@ in {
       type = lib.types.str;
     };
   };
-  config.systemd.user.services.gpgunlock = lib.mkIf config.services.gpgUnlock.enable {
-    Unit = {
-      Description = "Unlock gpg keys";
+  config = lib.mkIf config.services.gpgUnlock.enable {
+    systemd.user.services."${servicename}" = {
+      Unit = {
+        Description = "Unlock gpg keys";
 
-      Requires = ["gpg-agent.service"];
-      After = ["gpg-agent.service"];
+        Requires = ["gpg-agent.service"];
+        After = ["gpg-agent.service"];
+      };
+
+      Install = {WantedBy = ["default.target"];};
+      Service = {ExecStart = "${script}";};
     };
+    systemd.user.services.gpg-agent.Service = {
+      ExecReloadPost = "${pkgs.systemd}/bin/systemctl --user restart ${servicename}.service";
 
-    Install = {WantedBy = ["default.target"];};
-    Service = {ExecStart = "${script}";};
+    };
   };
 }
