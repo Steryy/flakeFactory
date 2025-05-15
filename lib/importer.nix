@@ -21,11 +21,20 @@
 
   defaultImport = nixModules: class:
     lib.mapAttrsRecursive (path: _:
-      if lib.lists.elemAt path 1 == class then {
-        enable = lib.mkDefault true;
-      } else
-        { }) { importer = nixModules; };
-  eval = { tags ? [ "all" ], modules ? [ ], specialArgs ? { }
+      if lib.lists.elemAt path 1 == class
+      then
+        (
+          if class == "all"
+          then {
+            enable = lib.mkForce true;
+          }
+          else {
+            enable = lib.mkDefault true;
+          }
+        )
+      else {}) {importer = nixModules;};
+
+  eval = { tags ? [ "all" "common" ], modules ? [ ], specialArgs ? { }
     , importerModules ? { }, ... }:
     let
       modulesToAdd = [{
@@ -41,12 +50,10 @@
           config._module.freeformType = lib.types.unspecified;
 
         }] ++ (map (x:
-          if x == "all" then
-            (defaultImport importerModules "common")
-          else
-            (defaultImport importerModules x)) tags);
+            (defaultImport importerModules x)) (tags ++ ["common"] ));
       };
     in {
+      evaled = evaled;
       modules = modules ++ modulesToAdd ++ (map (x: {
         imports = [ x.path ];
         _file = x.path;
