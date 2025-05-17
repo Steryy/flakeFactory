@@ -60,6 +60,7 @@
       haumea = {
         nixModules = {
           src = ./modules/nixos;
+      };
         hosts = {
           src = ./hosts;
           loader = _: import;

@@ -1,6 +1,6 @@
-{ lib, options, inputs, pkgs, ... }:
+{ lib, options, extraInputs, pkgs, ... }:
 let
-  inherit (inputs.nur.legacyPackages."${pkgs.system}".repos.rycee.firefox-addons)
+  inherit (extraInputs.nur.legacyPackages."${pkgs.system}".repos.rycee.firefox-addons)
     buildFirefoxXpiAddon british-english-dictionary-2 polish-dictionary;
   extensions = [
     british-english-dictionary-2

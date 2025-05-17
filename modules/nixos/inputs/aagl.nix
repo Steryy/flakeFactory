@@ -1,5 +1,5 @@
-{ inputs, ... }:
-let aagl = inputs.aagl;
+{ extraInputs, ... }:
+let aagl = extraInputs.aagl;
 in {
   imports = [ aagl.nixosModules.default ];
   nix.settings = aagl.nixConfig; # Set up Cachix
