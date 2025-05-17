@@ -1,7 +1,5 @@
 { lib, flakeRoot, config, inputs, ... }:
 let
-  domain = "tail4c5d3.ts.net";
-
   le = lib.pipe config.haumea.hosts [
 
     (lib.mapAttrs
@@ -29,6 +27,7 @@ in {
     inherit specialArgs;
     machines = lib.mapAttrs (n: v:
       let tags = config.clan.inventory.machines.${n}.tags or [ ];
+          user = v.deploy.adminUser or "user";
       in {
         imports = (eval {
           inherit tags;
@@ -45,21 +44,26 @@ in {
                 default = tags;
               };
             };
-            config = { inherit (v) importer; };
+            config = { 
+              _module.args.hostName = n;
+              users.defaultUser = user;
+              inherit (v) importer; };
           }];
         }).modules ++ v.modules;
       }) le;
 
     inventory = {
       services.importer.all.roles.default = {
-        tags = [ "all" ];
-        extraModules = [{
-          networking.domain = domain;
-          clan.core.networking.buildHost = "localhost";
-        }];
+        tags = ["all"];
+        extraModules = [
+          inputs.clan-core.clanModules.static-hosts
+          {
+            clan.core.networking.buildHost = "root@localhost";
+          }
+        ];
       };
       machines = lib.mapAttrs (n: v:
-        let user = v.deploy.adminUser or "root";
+        let user = v.deploy.adminUser or "user";
         in {
           inherit (v) tags;
         } // {
@@ -67,7 +71,7 @@ in {
             targetHost = if v ? "deploy" && v.deploy ? "targetHost" then
               v.deploy.targetHost
             else
-              "${user}@${n}.${domain}";
+              "${user}@${n}";
           };
 
         }) le;

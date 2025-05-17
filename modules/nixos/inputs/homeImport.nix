@@ -1,4 +1,4 @@
-{ extraInputs, config, lib, flakeRoot, homeModules, tags, options, inputs, ... }:
+{ extraInputs, config, lib, flakeRoot, homeModules, options, inputs, ... }:
 let
   hn = config.networking.hostName;
   dir = flakeRoot + "/homes";
@@ -40,6 +40,7 @@ let
         ];
         importerModules = (eval {
           inherit modules;
+          specialArgs = { inherit flakeRoot extraInputs inputs ; };
           inherit (config.clan.inventory) tags;
         });
 

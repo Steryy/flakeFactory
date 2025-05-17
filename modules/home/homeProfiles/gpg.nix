@@ -16,7 +16,7 @@ in {
       enableExtraSocket = true;
       enableScDaemon = true;
 
-      # pinentryPackage = cfg.pinentry;
+      pinentry.package = with pkgs; pinentry-qt ;
 
       defaultCacheTtl = agentTimeout;
       maxCacheTtl = agentTimeout;

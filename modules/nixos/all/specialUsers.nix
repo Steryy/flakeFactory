@@ -1,9 +1,12 @@
 { lib, config, options, ... }:
 let
-  cfg = config.clan.user-password.user;
+  cfg = config.users.defaultUser;
   groupsExists = groups:
     lib.filter (g: lib.hasAttr g config.users.groups) groups;
 in {
+  options.users.defaultUser = lib.mkOption {
+    type = lib.types.str;
+  };
 
   config = lib.mkMerge [
     (lib.optionalAttrs (options ? "persistence") {

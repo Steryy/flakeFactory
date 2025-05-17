@@ -26,7 +26,6 @@ in {
         "/dev/disk/by-id/ata-SAMSUNG_SSD_PM871b_M.2_2280_128GB_S3U2NE0M643392";
       networking.domains = [ "home.stanley-dev.net" ];
 
-      clan.user-password.user = adminUser;
       clan.nginx.acme.email = "contact@stanley-dev.net";
       services.nextcloud = {
 
