@@ -1,4 +1,4 @@
-{inputs,...}:
+{inputs, ...}:
 {
   clan = {
     inventory = {
@@ -10,6 +10,15 @@
             "kami"
             "villainess"
           ];
+
+          extraModules = [
+            ../../nixos/mycelium-hosts.nix
+            {
+              clan.mycelium-static-hosts = {
+                topLevelDomain = "mc";
+              };
+            }
+          ];
         };
 
         importer = {
@@ -18,6 +27,9 @@
             extraModules = [
               inputs.clan-core.clanModules.static-hosts
               {
+                clan.static-hosts ={
+                  topLevelDomain = "zt";
+                };
                 clan.core.networking.buildHost = "root@localhost";
               }
             ];
