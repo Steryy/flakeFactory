@@ -9,12 +9,19 @@
       repo = "flake-parts";
       inputs = { nixpkgs-lib = { follows = "nixpkgs"; }; };
     };
+
+    srvos.url = "github:nix-community/srvos";
+    srvos.inputs.nixpkgs.follows = "nixpkgs";
+
+    treefmt-nix.url = "github:numtide/treefmt-nix";
+    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     clan-core = {
       url = "git+https://git.clan.lol/clan/clan-core";
-      inputs.nixpkgs.follows =
-        "nixpkgs"; # Needed if your configuration uses nixpkgs unstable.
-      # New
-      inputs.flake-parts.follows = "flake-parts";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-parts.follows = "flake-parts";
+treefmt-nix.follows = "treefmt-nix";
+      };
     };
     sops-nix.follows = "clan-core/sops-nix";
 

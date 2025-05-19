@@ -53,15 +53,6 @@ in {
       }) le;
 
     inventory = {
-      services.importer.all.roles.default = {
-        tags = ["all"];
-        extraModules = [
-          inputs.clan-core.clanModules.static-hosts
-          {
-            clan.core.networking.buildHost = "root@localhost";
-          }
-        ];
-      };
       machines = lib.mapAttrs (n: v:
         let user = v.deploy.adminUser or "user";
         in {

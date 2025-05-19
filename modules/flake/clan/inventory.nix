@@ -1,4 +1,5 @@
- {
+{inputs,...}:
+{
   clan = {
     inventory = {
       services = {
@@ -9,6 +10,37 @@
             "kami"
             "villainess"
           ];
+        };
+
+        importer = {
+          all.roles.default = {
+            tags = ["all"];
+            extraModules = [
+              inputs.clan-core.clanModules.static-hosts
+              {
+                clan.core.networking.buildHost = "root@localhost";
+              }
+            ];
+          };
+          headless.roles.default = {
+            tags = ["villainess" "shou" "seirei"];
+            extraModules = with inputs.srvos.nixosModules; [
+              server
+              mixins-telegraf
+
+              
+            ];
+
+          };
+          kami.roles.default = {
+            tags = ["kami"];
+            extraModules = with inputs.srvos.nixosModules; [
+              desktop
+              mixins-systemd-boot
+              mixins-nix-experimental
+            ];
+
+          };
         };
         zerotier.default = {
           roles = {
