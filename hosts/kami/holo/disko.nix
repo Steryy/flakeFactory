@@ -1,9 +1,12 @@
-{ inputs, flakeRoot, ... }:
+{  flakeRoot, config, ... }:
 let
   pers = "persist";
   root = "root";
 in {
-  imports = [ (flakeRoot + "/modules/disko/btrfs-luks.nix") ];
+  imports = [
+    (flakeRoot + "/modules/disko/btrfs-luks.nix") 
+    (flakeRoot + "/modules/disko/password.nix") 
+  ];
   diskoTemplate = {
     disk = {
       labels = [ "bootL" "looksLabelRoot" "luksMapped" ];
@@ -14,7 +17,7 @@ in {
         "/dev/disk/by-id/usb-TOSHIBA_TransMemory_C412F52D6C8CC011300B68D7-0:0-part2"
       ];
       fsType = "btrfs";
-      passFile = "/fdafdas";
+      passFile = config.clan.core.vars.generators.diskpassword.files.diskpassword.path;
       keyFileSize = 4096;
       additionalMount = {
         "@swap" = {
