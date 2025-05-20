@@ -9,6 +9,9 @@ in {
   };
 
   config = lib.mkMerge [
+    (lib.optionalAttrs (options.clan ? "user-password") {
+      clan.user-password.user = cfg;
+    })
     (lib.optionalAttrs (options ? "persistence") {
       persistence.userNames = [ cfg ];
     })
@@ -22,31 +25,34 @@ in {
         openssh.authorizedKeys.keys =
           config.users.users.root.openssh.authorizedKeys.keys;
         extraGroups = [ "wheel" "nix" ] ++ groupsExists [
+
+          "adbusers"
+          "audio"
+          "cloudflared"
+          "dialout"
+          "docker"
+          "git"
+          "i2c"
+          "input"
+          "libvirtd"
+          "lp"
+          "lp"
+          "mysql"
           "network"
           "networkmanager"
-          "systemd-journal"
-          "audio"
-          "pipewire"
-          "video"
-          "input"
-          "uinput"
-          "plugdev"
-          "lp"
-          "tss"
-          "power"
-          "wireshark"
-          "mysql"
-          "docker"
-          "podman"
-          "git"
-          "libvirtd"
-          "cloudflared"
-          "uiput"
-          "i2c"
-          "dialout"
           "openvpn"
-          "adbusers"
+          "pipewire"
+          "plugdev"
+          "podman"
+          "power"
+          "scanner"
           "soundmodem"
+          "systemd-journal"
+          "tss"
+          "uinput"
+          "uiput"
+          "video"
+          "wireshark"
         ];
       };
     }
