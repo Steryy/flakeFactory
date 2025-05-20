@@ -1,4 +1,7 @@
-{inputs, ...}:
+{inputs,config, ...}:
+let
+  nixModules = config.haumea.nixModules;
+in 
 {
   clan = {
     inventory = {
@@ -11,25 +14,21 @@
             "villainess"
           ];
 
-          extraModules = [
-            ../../nixos/mycelium-hosts.nix
-            {
-              clan.mycelium-static-hosts = {
-                topLevelDomain = "mc";
-              };
-            }
-          ];
         };
 
         importer = {
           all.roles.default = {
-            tags = ["all"];
-            extraModules = [
-              inputs.clan-core.clanModules.static-hosts
-              {
-                clan.static-hosts ={
-                  topLevelDomain = "zt";
-                };
+            tags = ["nixos"];
+            extraModules =
+              (builtins.attrValues nixModules.all)
+              ++ [
+                inputs.clan-core.clanModules.static-hosts
+                {
+                  clan = {
+                    mycelium-static-hosts = {
+                      topLevelDomain = "mc";
+                    };
+                  };
                 clan.core.networking.buildHost = "root@localhost";
               }
             ];
