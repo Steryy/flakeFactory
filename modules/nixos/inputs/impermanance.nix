@@ -57,6 +57,7 @@ in {
 
     cache = dirDef {
       dir = "/persist/@cache";
+
       userDirs = [ ".ssh" ".local/state/nix" ".cache" ];
     };
     userNames = lib.mkOption {
@@ -70,7 +71,9 @@ in {
   };
   imports = [ extraInputs.impermanence.nixosModules.impermanence ];
   config = lib.mkMerge [
+  
     {
+    sops.age.keyFile = null;
 
       boot.initrd.systemd.services.clean = {
         wantedBy = [ "initrd.target" ];
