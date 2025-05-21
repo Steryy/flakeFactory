@@ -14,6 +14,7 @@
 
       git.enable = true;
       programs = {
+        ssh.enable = true;
         librewolf.enable = true;
         starship.enable = true;
         ghostty.enable = true;
