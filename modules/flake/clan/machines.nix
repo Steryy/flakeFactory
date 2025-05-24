@@ -22,12 +22,23 @@ let
       importerModules = modules;
       inherit specialArgs;
     });
+  supportedSystems = [
+    "x86_64"
+    "aarch64"
+    "riscv64"
+  ];
 in {
   clan = {
     inherit specialArgs;
     machines = lib.mapAttrs (n: v:
-      let tags = config.clan.inventory.machines.${n}.tags or [ ];
-          user = v.deploy.adminUser or "user";
+      let 
+        tags = config.clan.inventory.machines.${n}.tags or [ ];
+        user = v.deploy.adminUser or "user";
+        os = {nixos = "linux"; darwin = "darwin"; }."${v.machineClass}";
+
+        getArch = 
+          lib.removePrefix "arch-"
+          (lib.lists.findFirst (x: lib.hasPrefix "arch-" x ) null tags);
       in {
         imports = (eval {
           inherit tags;
@@ -44,7 +55,11 @@ in {
                 default = tags;
               };
             };
+            imports = [
+              {nixpkgs.hostPlatform = "${getArch}-${os}"  ;}
+            ];
             config = { 
+              
               _module.args.hostName = n;
               users.defaultUser = user;
               inherit (v) importer; };
@@ -54,18 +69,22 @@ in {
 
     inventory = {
       machines = lib.mapAttrs (n: v:
-        let user = v.deploy.adminUser or "user";
+        let 
+          user = v.deploy.adminUser or "user";
         in {
-          inherit (v) tags;
-        } // {
+            machineClass = v.machineClass or "nixos";
+
           deploy = {
             targetHost = if v ? "deploy" && v.deploy ? "targetHost" then
               v.deploy.targetHost
             else
               "${user}@${n}";
           };
-
-        }) le;
+            tags =
+              v.tags ++
+              (lib.optional 
+                (!(lib.any (x: lib.elem "arch-${x}" v.tags) supportedSystems)) "arch-x86_64") ;
+        } ) le;
     };
   };
 }
