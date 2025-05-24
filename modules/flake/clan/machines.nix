@@ -10,105 +10,81 @@ let
 
     lib.listToAttrs
   ];
-  nixModules =
-    config.haumea.nixModules
-    // {
-      tags = config.haumea.clan.tags or {};
-    };
-  homeModules = config.haumea.homeModules or {};
+  nixModules = config.haumea.nixModules;
+  homeModules = config.haumea.homeModules;
 
   specialArgs = { inherit flakeRoot inputs homeModules; 
     extraInputs = config.partitions.extraInputs.extraInputs; };
-  desktop=["kami"];
+  eval = x:
+    let modules = if lib.elem "nixos" x.tags then nixModules else null;
+    in (import (flakeRoot + "/lib/importer.nix") { inherit lib; }).eval (x // {
+      modules = (x.modules);
+      importerModules = modules;
+      inherit specialArgs;
+    });
+  supportedSystems = [
+    "x86_64"
+    "aarch64"
+    "riscv64"
+  ];
 in {
   clan = {
     inherit specialArgs;
     machines = lib.mapAttrs (n: v:
-      let tags = config.clan.inventory.machines.${n}.tags or [ ];
-          user = v.deploy.adminUser or "user";
+      let 
+        tags = config.clan.inventory.machines.${n}.tags or [ ];
+        user = v.deploy.adminUser or "user";
+        os = {nixos = "linux"; darwin = "darwin"; }."${v.machineClass}";
+
+        getArch = 
+          lib.removePrefix "arch-"
+          (lib.lists.findFirst (x: lib.hasPrefix "arch-" x ) null tags);
       in {
-        imports = 
-          v.modules  ++ [{
+        imports = (eval {
+          inherit tags;
+          modules = [{
+            options.clan.inventory = {
+              machines = lib.mkOption {
+                type = lib.types.attrs;
+                readOnly = true;
+                default = config.clan.inventory.machines;
+              };
+              tags = lib.mkOption {
+                type = lib.types.listOf lib.types.str;
+                readOnly = true;
+                default = tags;
+              };
+            };
+            imports = [
+              {nixpkgs.hostPlatform = "${getArch}-${os}"  ;}
+            ];
             config = { 
-              clan.inventory.tags = tags;
+              
               _module.args.hostName = n;
               users.defaultUser = user;
-            };
-          }] ;
+              inherit (v) importer; };
+          }];
+        }).modules ++ v.modules;
       }) le;
 
     inventory = {
-      services.importer =
-        lib.mapAttrs' (n: v: {
-          name = lib.head (lib.splitString "-" n);
-          value = {
-            machines."${n}" = let
-              tags = config.clan.inventory.machines."${n}".tags;
-              impr = enable:
-                lib.pipe v.importer [
-                  (lib.mapAttrs (nam: lib.filterAttrs (tag: _:
-                      let 
-                        y = if nam == "tags" then
-                          lib.elem tag tags
-                        else true;
+      machines = lib.mapAttrs (n: v:
+        let 
+          user = v.deploy.adminUser or "user";
+        in {
+            machineClass = v.machineClass or "nixos";
 
-                      in
-                    lib.warnIfNot y "To import machine ${n} must be tagged with ${tag}" y
-                    )))
-                  (lib.mapAttrsRecursiveCond (x: ! x ? "enable") (p: v: {
-                    path = p;
-                    enable = v.enable;
-                  }))
-
-                  (lib.collect (x: x  ? "path" && x ? "enable" && x.enable == enable))
-
-                  (lib.filter (x: 
-                    let
-                      y = if (lib.elemAt x.path 0 == "tags") then 
-                            (lib.elemAt x.path 2 != "required")
-                          else true;
-                    in 
-                      lib.throwIfNot y "Required cannot be imported ${n}" y
-                  ))
-
-                  (lib.filter (x:  lib.hasAttrByPath x.path nixModules ))
-                  (map (x: lib.getAttrFromPath x.path nixModules))
-                ];
-              disabledModules = impr false;
-            in {
-              extraModules =
-                (impr true)
-                ++ 
-                lib.optional (lib.length  disabledModules  >0 )
-                  {
-                  inherit disabledModules;
-                  }
-                ;
-            };
-          };
-        }) le;
-
-      machines = lib.mapAttrs (n: v: let
-        user = v.deploy.adminUser or "user";
-      in
-        {
-          tags =
-            v.tags
-            ++ (
-              if lib.any (x: lib.elem x v.tags) desktop
-              then ["type:desktop"]
-              else ["type:server"]
-            );
-          # inherit (v) tags;
-        } // {
           deploy = {
             targetHost = if v ? "deploy" && v.deploy ? "targetHost" then
               v.deploy.targetHost
             else
               "${user}@${n}";
           };
-
-        }) le;
+            tags =
+              v.tags ++
+              (lib.optional 
+                (!(lib.any (x: lib.elem "arch-${x}" v.tags) supportedSystems)) "arch-x86_64") ;
+        } ) le;
     };
   };
 }
