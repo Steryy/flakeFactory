@@ -1,5 +1,5 @@
 { ... }:
-let
+{
 
   imports = [
     ./importer.nix
@@ -35,4 +35,5 @@ let
         fonts.fontconfig.enable = true;
       })
   ];
+
 }
