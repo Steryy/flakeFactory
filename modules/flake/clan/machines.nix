@@ -48,15 +48,23 @@ in {
         lib.mapAttrs' (n: v: {
           name = lib.head (lib.splitString "-" n);
           value = {
-            machines."${n}" = {
-              extraModules =
+            machines."${n}" = let
+              impr = enable:
                 lib.pipe v.importer [
                   (lib.mapAttrsRecursiveCond (x: ! x ? "enable") (p: v: {
                     path = p;
                     enable = v.enable;
                   }))
-                  (lib.collect (x: x  ? "path" && x ? "enable" && x.enable))
+                  (lib.collect (x: x  ? "path" && x ? "enable" && x.enable == enable))
                   (map (x: lib.getAttrFromPath x.path nixModules))
+                ];
+            in {
+              extraModules =
+                (impr true)
+                ++ [
+                  {
+                    disabledModules = impr false;
+                  }
                 ];
             };
           };
