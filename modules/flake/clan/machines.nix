@@ -15,13 +15,6 @@ let
 
   specialArgs = { inherit flakeRoot inputs homeModules; 
     extraInputs = config.partitions.extraInputs.extraInputs; };
-  eval = x:
-    let modules = if lib.elem "nixos" x.tags then nixModules else null;
-    in (import (flakeRoot + "/lib/importer.nix") { inherit lib; }).eval (x // {
-      modules = (x.modules);
-      importerModules = modules;
-      inherit specialArgs;
-    });
 in {
   clan = {
     inherit specialArgs;
@@ -29,9 +22,8 @@ in {
       let tags = config.clan.inventory.machines.${n}.tags or [ ];
           user = v.deploy.adminUser or "user";
       in {
-        imports = (eval {
-          inherit tags;
-          modules = [{
+        imports = 
+          v.modules  ++ [{
             options.clan.inventory = {
               machines = lib.mkOption {
                 type = lib.types.attrs;
@@ -47,15 +39,33 @@ in {
             config = { 
               _module.args.hostName = n;
               users.defaultUser = user;
-              inherit (v) importer; };
-          }];
-        }).modules ++ v.modules;
+            };
+          }] ;
       }) le;
 
     inventory = {
-      machines = lib.mapAttrs (n: v:
-        let user = v.deploy.adminUser or "user";
-        in {
+      services.importer =
+        lib.mapAttrs' (n: v: {
+          name = lib.head (lib.splitString "-" n);
+          value = {
+            machines."${n}" = {
+              extraModules =
+                lib.pipe v.importer [
+                  (lib.mapAttrsRecursiveCond (x: ! x ? "enable") (p: v: {
+                    path = p;
+                    enable = v.enable;
+                  }))
+                  (lib.collect (x: x  ? "path" && x ? "enable" && x.enable))
+                  (map (x: lib.getAttrFromPath x.path nixModules))
+                ];
+            };
+          };
+        }) le;
+
+      machines = lib.mapAttrs (n: v: let
+        user = v.deploy.adminUser or "user";
+      in
+        {
           inherit (v) tags;
         } // {
           deploy = {
