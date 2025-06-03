@@ -3,7 +3,6 @@ in {
   deploy = { inherit adminUser; };
 
   importer = {
-    common.readOnlypkgs.enable = false;
     inputs = {
       homeImport.enable = true;
       impermanance.enable = true;
@@ -13,8 +12,11 @@ in {
   };
   modules = [
     ./disko.nix
-    ({ inputs, pkgs, ... }: {
+    ({  pkgs, lib, ... }: {
       nixpkgs.hostPlatform = "x86_64-linux";
+      sops.age.keyFile = lib.mkForce "/persist/@state/var/lib/sops-nix/key.txt";
+      services.upower.enable = true;
+      services.power-profiles-daemon.enable = true;
       nixpkgs.config = {
         allowBroken = true;
         allowUnfree = true;
