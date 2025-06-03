@@ -1,34 +1,9 @@
 {...}: {
   home.file.
-    ".config/ags/modules/.configuration/default_options.jsonc".text =
+    ".config/ags/user_options.jsonc".text =
+    # ~/.config/ags/modules/.configuration/default_options.jsonc
     #jsonc
     ''{
-          // General stuff
-          "ai": {
-              "defaultGPTProvider": "ollama_llama_3_2",
-              "defaultTemperature": 0.5,
-              "enhancements": true,
-              "charsEachUpdate": 50, // Lower = smoother update rate, but more update lag
-              "keep_alive": -1, // For ollama. -1 means forever
-              "useHistory": false,
-              "safety": true,
-              "writingCursor": " ...", // Warning: Using weird characters can mess up Markdown rendering
-              "proxyUrl": null, // Can be "socks5://127.0.0.1:9050" or "http://127.0.0.1:8080" for example. Leave it blank if you don't need it.
-              "extraGptModels": {
-                  // Below is an example. Copy to user_options.jsonc and edit it
-                  // The base url is conveniently ollama's btw
-                  // "model_id": {
-                  //     "name": "User-added model",
-                  //     "logo_name": "ollama-symbolic",
-                  //     "description": "A model added by the user",
-                  //     "base_url": "http://localhost:11434/v1/chat/completions",
-                  //     "key_get_url": "",
-                  //     "requires_key": false,
-                  //     "key_file": "api_key_file.txt",
-                  //     "model": "model-name"
-                  // },
-              }
-          },
           "animations": {
               "choreographyDelay": 35,
               "durationSmall": 110,
@@ -55,76 +30,8 @@
               "taskManager": "gnome-usage",
               "terminal": "ghostty" // This is only for shell actions
           },
-          "bar": {
-              // Whether to show Swap and CPU usage when there's media. RAM is always shown.
-              "alwaysShowFullResources": false,
-              // Array of bar modes for each monitor. Hit Ctrl+Alt+Slash to cycle.
-              // Modes: "normal", "focus" (workspace indicator only), "nothing"
-              // Example for four monitors: ["normal", "focus", "normal", "nothing"]
-              "modes": [
-                  "normal"
-              ]
-          },
-          "battery": {
-              "low": 20,
-              "critical": 10,
-              "warnLevels": [
-                  20,
-                  15,
-                  5
-              ],
-              "warnTitles": [
-                  "Low battery",
-                  "Very low battery",
-                  "Critical Battery"
-              ],
-              "warnMessages": [
-                  "Plug in the charger",
-                  "You there?",
-                  "PLUG THE CHARGER ALREADY"
-              ],
-              "suspendThreshold": 3
-          },
-          "brightness": {
-              // Object of controller names for each monitor, either "brightnessctl" or "ddcutil" or "auto"
-              // "default" one will be used if unspecified
-              // Examples
-              // "eDP-1": "brightnessctl",
-              // "DP-1": "ddcutil",
-              "controllers": {
-                  "default": "auto"
-              }
-          },
-          "cheatsheet": {
-              "keybinds": {
-                  "configPath": "" // Path to hyprland keybind config file. Leave empty for default (~/.config/hypr/hyprland/keybinds.conf)
-              }
-          },
-          "gaming": {
-              "crosshair": {
-                  "size": 20,
-                  "color": "rgba(113,227,32,0.9)"
-              }
-          },
-          "i18n": {
-              "langCode": "", //Customize the locale, such as zh_CN,Optional value references "~/.config/ags/i18n/locales/"
-              "extraLogs": false
-          },
-          "monitors": {
-              "scaleMethod": "division" // Either "division" [default] or "gdk"
-          },
           "music": {
               "preferredPlayer": "plasma-browser-integration"
-          },
-          "onScreenKeyboard": {
-              "layout": "qwerty_full" // See modules/onscreenkeyboard/onscreenkeyboard.js for available layouts
-          },
-          "overview": {
-              "scale": 0.18, // Relative to screen size
-              "numOfRows": 2,
-              "numOfCols": 5,
-              "wsNumScale": 0.09,
-              "wsNumMarginScale": 0.07
           },
           "sidebar": {
               "image": {
@@ -140,10 +47,11 @@
                   "defaultPage": "apis",
                   "apis": {
                       "order": [
-                          "gemini",
-                          "gpt",
+
                           "waifu",
-                          "booru"
+                          "booru",
+                          "gemini",
+                          "gpt"
                       ],
                       "defaultPage": "gemini"
                   }
@@ -251,42 +159,6 @@
                   }
               ]
           },
-          "keybinds": {
-              // Format: "Modifier_1+...+Modifier_n+key". The key is CaSe SeNsItIvE!
-              // Modifiers: Shift Ctrl Alt Hyper Meta
-              // See https://docs.gtk.org/gdk3/index.html#constants for keys (listed as KEY_key)
-              // You can assign multiple keybinds for the same action. Just split them with a comma
-              // Example: "Ctrl+Page_Down, ctrl+Tab"
-              "overview": {
-                  "altMoveLeft": "Ctrl+B",
-                  "altMoveRight": "Ctrl+F",
-                  "deleteToEnd": "Ctrl+K"
-              },
-              "sidebar": {
-                  "apis": {
-                      "nextTab": "Page_Down",
-                      "prevTab": "Page_Up"
-                  },
-                  "options": { // Right sidebar
-                      "nextTab": "Page_Down",
-                      "prevTab": "Page_Up"
-                  },
-                  "expand": "Ctrl+E",
-                  "pin": "Ctrl+P",
-                  "cycleTab": "Ctrl+Tab",
-                  "nextTab": "Ctrl+Page_Down",
-                  "prevTab": "Ctrl+Page_Up"
-              },
-              "cheatsheet": {
-                  "keybinds": {
-                      "nextTab": "Page_Down",
-                      "prevTab": "Page_Up"
-                  },
-                  "nextTab": "Ctrl+Page_Down",
-                  "prevTab": "Ctrl+Page_Up",
-                  "cycleTab": "Ctrl+Tab"
-              }
-          }
       }
     '';
 }
