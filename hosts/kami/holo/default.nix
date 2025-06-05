@@ -3,7 +3,6 @@ in {
   deploy = { inherit adminUser; };
 
   importer = {
-    common.readOnlypkgs.enable = false;
     inputs = {
       homeImport.enable = true;
       impermanance.enable = true;
