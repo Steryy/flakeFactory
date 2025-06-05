@@ -1,8 +1,7 @@
-{ config, inputs, lib, ... }:
+{ config,  lib, ... }:
 let userNames = lib.attrNames config.clan.postgresql.users;
 in {
 
-  imports = [ inputs.clan-core.clanModules.postgresql ];
   services.postgresql = {
     enable = true;
     ensureUsers = map (name: {
