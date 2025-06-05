@@ -28,6 +28,8 @@ in
 
           }) nixModules) //
           {
+          type-server.roles.default = {
+            tags = [ "type:server"];
             extraModules = with inputs.srvos.nixosModules; [
               server
               mixins-telegraf
@@ -36,8 +38,8 @@ in
             ];
 
           };
-          kami.roles.default = {
-            tags = ["kami"];
+          type-desktop.roles.default = {
+            tags = ["type:desktop"];
             extraModules = with inputs.srvos.nixosModules; [
               desktop
               mixins-systemd-boot

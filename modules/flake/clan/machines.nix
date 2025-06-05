@@ -102,7 +102,14 @@ in {
         user = v.deploy.adminUser or "user";
       in
         {
-          inherit (v) tags;
+          tags =
+            v.tags
+            ++ (
+              if lib.any (x: lib.elem x v.tags) desktop
+              then ["type:desktop"]
+              else ["type:server"]
+            );
+          # inherit (v) tags;
         } // {
           deploy = {
             targetHost = if v ? "deploy" && v.deploy ? "targetHost" then
