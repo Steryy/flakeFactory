@@ -19,6 +19,7 @@ let
 
   specialArgs = { inherit flakeRoot inputs homeModules; 
     extraInputs = config.partitions.extraInputs.extraInputs; };
+  desktop=["kami"];
 in {
   clan = {
     inherit specialArgs;
