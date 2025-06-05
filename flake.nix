@@ -97,7 +97,7 @@ treefmt-nix.follows = "treefmt-nix";
         diskoModules = {
           src = ./modules/disko;
         };
-        clanServices = { src = ./modules/clan; };
+        clan = { src = ./modules/clan; };
       };
       imports =
         flakeModules;
