@@ -1,6 +1,6 @@
-{inputs,config, ...}:
+{inputs,config, lib, ...}:
 let
-  nixModules = config.haumea.nixModules;
+  nixModules = config.haumea.clan.tags or {};
 in 
 {
   clan = {
@@ -16,25 +16,20 @@ in
 
         };
 
-        importer = {
-          all.roles.default = {
-            tags = ["nixos"];
-            extraModules =
-              (builtins.attrValues nixModules.all)
-              ++ [
-                inputs.clan-core.clanModules.static-hosts
-                {
-                  clan = {
-                    mycelium-static-hosts = {
-                      topLevelDomain = "mc";
-                    };
-                  };
-                clan.core.networking.buildHost = "root@localhost";
-              }
-            ];
-          };
-          headless.roles.default = {
-            tags = ["villainess" "shou" "seirei"];
+        importer = 
+          (lib.mapAttrs (n: v: {
+            roles.default = {
+              tags = [n];
+              extraModules = 
+                lib.collect (x: lib.isPath x) 
+                (lib.filterAttrs (n: _: (n == "required") || n == "default"   ) v )
+                ;
+            };
+
+          }) nixModules) //
+          {
+          type-server.roles.default = {
+            tags = [ "type:server"];
             extraModules = with inputs.srvos.nixosModules; [
               server
               mixins-telegraf
@@ -43,8 +38,8 @@ in
             ];
 
           };
-          kami.roles.default = {
-            tags = ["kami"];
+          type-desktop.roles.default = {
+            tags = ["type:desktop"];
             extraModules = with inputs.srvos.nixosModules; [
               desktop
               mixins-systemd-boot

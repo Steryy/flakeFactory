@@ -2,7 +2,6 @@ let adminUser = "francois";
 in {
   deploy = { inherit adminUser; };
   importer = {
-    common.readOnlypkgs.enable = false;
     services = {
       hosted = {
         forgejo.enable = true;
@@ -15,8 +14,12 @@ in {
     };
   };
   modules = [
-    ({ pkgs, config, flakeRoot, ... }: {
-      imports = [ (flakeRoot + "/modules/disko/ext4.nix") ];
+    ({ inputs, pkgs, config, flakeRoot, ... }: {
+      imports = [ 
+        (flakeRoot + "/modules/disko/ext4.nix") 
+         inputs.clan-core.clanModules.nginx 
+         inputs.clan-core.clanModules.postgresql 
+      ];
       nixpkgs.hostPlatform = "x86_64-linux";
       nixpkgs.config = {
         allowBroken = true;

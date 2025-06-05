@@ -9,7 +9,7 @@
     or {cursor = null;};
 in {
   environment.systemPackages = let
-    bg = "#2e3440";
+    bg = config.lib.stylix.colors.base00 or "2e3440";
   in [
     (pkgs.where-is-my-sddm-theme.override {
       themeConfig.General = {
@@ -18,7 +18,7 @@ in {
         showUserRealNameByDefault = false;
         # passwordTextColor = "random";
         background = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-        backgroundFill = bg;
+        backgroundFill = "#${bg}";
         backgroundMode = "none";
       };
     })
