@@ -6,7 +6,6 @@
       sops-nix.enable = true;
     };
     homeProfiles = {
-      xdgUserDirs.enable = true;
       zsh.enable = true;
       gpg.enable = true;
       rofi.enable = true;
