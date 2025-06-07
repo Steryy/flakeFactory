@@ -10,8 +10,6 @@
       Settings.AutoConnect = true;
     };
   };
-
-  # Set the network manager backend to iwd
   networking.networkmanager.wifi.backend = "iwd";
 
 }

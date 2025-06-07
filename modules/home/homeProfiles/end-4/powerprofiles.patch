@@ -1,0 +1,161 @@
+diff --git a/.config/ags/modules/sideright/centermodules/powerprofiles.js b/.config/ags/modules/sideright/centermodules/powerprofiles.js
+new file mode 100644
+index 00000000..9af53767
+--- /dev/null
++++ b/.config/ags/modules/sideright/centermodules/powerprofiles.js
+@@ -0,0 +1,101 @@
++import Widget from 'resource:///com/github/Aylur/ags/widget.js';
++import PowerProfiles from "resource:///com/github/Aylur/ags/service/powerprofiles.js";
++import * as Utils from 'resource:///com/github/Aylur/ags/utils.js';
++const { Box, Button, Entry, Icon, Label, Revealer, Scrollable, Slider, Stack, Overlay } = Widget;
++const { execAsync, exec } = Utils;
++import { MaterialIcon } from '../../.commonwidgets/materialicon.js';
++
++const PROFILES_META = {
++    'power-saver': {
++        'label': "Power Saver",
++        'icon': "access_time",
++        'describe': "Reduced performance and power usage",
++    },
++    'balanced': {
++        'label': "Balanced",
++        'icon': "balance",
++        'describe': "Standard performance and power usage",
++    },
++    'performance': {
++        'label': "Performance",
++        'icon': "bolt",
++        'describe': "High performance and power usage"
++    },
++};
++
++/**
++ * The item in the profile list
++ * (Profile, CpuDriver, PlatformDriver, Driver)
++ * @param {{[key: string]: string}} profile 
++ */
++const PowerProfile = (profile) => {
++    const is_selected = () => PowerProfiles.active_profile == profile['Profile'];
++    const meta = PROFILES_META[profile['Profile']];
++
++    const profileName = Box({
++        vertical: true,
++        children: [
++            Label ({
++                hpack: 'start',
++                label: meta.label
++            }),
++            Label ({
++                hpack: 'start',
++                className: 'txt-smaller txt-subtext',
++                label: meta.describe
++            })
++        ],
++    });
++
++    return Button ({
++        onClicked: is_selected() ? () => { } : () => { PowerProfiles.active_profile = profile['Profile']; },
++        child: Box ({
++            className: 'sidebar-wifinetworks-network spacing-h-10',
++            children: [
++                MaterialIcon (meta.icon, 'hugerass'),
++                profileName,
++                Box ({ hexpand: true }),
++                is_selected() ? MaterialIcon('check', 'large') : null
++            ],
++        }),
++    });
++}
++
++export default (props) => {
++    const profile_list = Box ({
++        vertical: true,
++        className: 'spacing-v-10',
++        children: [
++            Overlay ({
++                passThrough: true,
++                child: Scrollable({
++                    vexpand: true,
++                    child: Box ({
++                        vertical: true,
++                        attribute: {
++                            'updateProfiles': (self) => {
++                                self.children = PowerProfiles.profiles.map(n => PowerProfile(n)).reverse();
++                            },
++                        },
++                        className: 'spacing-v-5 margin-bottom-15',
++                        setup: (self) => self.hook (PowerProfiles, self.attribute.updateProfiles),
++                    }),
++                }),
++                overlays: [
++                    Box({
++                        className: 'sidebar-centermodules-scrollgradient-bottom'
++                    }),
++                ],
++            }),
++        ],
++    });
++
++    return Box ({
++        ...props,
++        className: 'spacing-v-10',
++        vertical: true,
++        children: [
++            profile_list
++        ],
++    });
++}
+diff --git a/.config/ags/modules/sideright/sideright.js b/.config/ags/modules/sideright/sideright.js
+index 12a01297..b0622114 100644
+--- a/.config/ags/modules/sideright/sideright.js
++++ b/.config/ags/modules/sideright/sideright.js
+@@ -19,6 +19,7 @@ import {
+ import ModuleNotificationList from "./centermodules/notificationlist.js";
+ import ModuleAudioControls from "./centermodules/audiocontrols.js";
+ import ModuleWifiNetworks from "./centermodules/wifinetworks.js";
++import ModulePowerProfiles from './centermodules/powerprofiles.js';
+ import ModuleBluetooth from "./centermodules/bluetooth.js";
+ import ModuleConfigure from "./centermodules/configure.js";
+ import { ModuleCalendar } from "./calendar.js";
+@@ -38,7 +39,6 @@ const QUICK_TOGGLES = {
+     'idleinhibitor': ModuleIdleInhibitor(),
+     'cloudflarewarp': await ModuleCloudflareWarp(),
+ }
+-
+ const centerWidgets = [
+     {
+         name: getString('Notifications'),
+@@ -50,6 +50,11 @@ const centerWidgets = [
+         materialIcon: 'volume_up',
+         contentWidget: ModuleAudioControls,
+     },
++    {
++        name: 'Power Profiles',
++        materialIcon: 'speed',
++        contentWidget: ModulePowerProfiles,
++    },
+     {
+         name: getString('Bluetooth'),
+         materialIcon: 'bluetooth',
+@@ -62,7 +67,7 @@ const centerWidgets = [
+         onFocus: () => execAsync('nmcli dev wifi list').catch(print),
+     },
+     {
+-        name: getString('Quick config'),
++        name: getString('Live config'),
+         materialIcon: 'tune',
+         contentWidget: ModuleConfigure,
+     },
+@@ -181,10 +186,10 @@ export default () => Box({
+     ],
+     setup: (self) => self
+         .on('key-press-event', (widget, event) => { // Handle keybinds
+-            if (checkKeybind(event, userOptions.keybinds.sidebar.options.nextTab)) {
++            if (checkKeybind(event, userOptions.asyncGet().keybinds.sidebar.options.nextTab)) {
+                 sidebarOptionsStack.nextTab();
+             }
+-            else if (checkKeybind(event, userOptions.keybinds.sidebar.options.prevTab)) {
++            else if (checkKeybind(event, userOptions.asyncGet().keybinds.sidebar.options.prevTab)) {
+                 sidebarOptionsStack.prevTab();
+             }
+         })

@@ -2,25 +2,14 @@
   pkgs,
   config,
   lib,
-  options,
   ...
-}: let
-in {
+}: {
   config = lib.mkMerge [
-    (
-      lib.optionalAttrs (options ? "persistence")
-      {
-        persistence.cache.directories = [
-          config.programs.zsh.dotDir
-        ];
-      }
-    )
-    # {
-    #   impermanance.directories = lib.mkIf (options ? "impermanance" && options.impermanance.directory.isDefined) [
-    #     config.programs.zsh.dotDir
-    #   ];
-    # }
     {
+      xdg.userDirs.extraConfig = {
+        ZDOTDIR =
+          config.programs.zsh.dotDir;
+      };
       programs.zsh = {
         enable = true;
         history = {

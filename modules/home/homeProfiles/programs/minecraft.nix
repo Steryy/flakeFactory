@@ -1,20 +1,14 @@
 {
   pkgs,
   lib,
-  options,
   ...
 }: {
   config = lib.mkMerge [
-    (
-      lib.optionalAttrs (options ? "persistence")
-      {
-        persistence.state.directories = [
-          ".local/share/PrismLauncher"
-          ".local/share/ATLauncher"
-        ];
-      }
-    )
     {
+      xdg.userDirs.extraConfig = {
+        PRISMLAUNCHER_CACHE = ".local/share/PrismLauncher";
+        ATLAUNCHER_CACHE = ".local/share/ATLauncher";
+      };
       home.packages = with pkgs; [
         (prismlauncher.override {
           jdks = [temurin-bin-21 temurin-bin-8 temurin-bin-17];

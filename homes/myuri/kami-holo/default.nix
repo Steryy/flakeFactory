@@ -1,9 +1,8 @@
-{ ... }:
-let
-
+{
   imports = [
     ./importer.nix
     ./_packages.nix
+    ./hyprland.nix
     ({ options, lib, ... }: {
       config = lib.mkMerge [
 
@@ -14,7 +13,8 @@ let
               method = "symlink";
             }
             ".local/share/supermaven"
-            ".local/share/anime-games-launcher"
+            ".local/share/nvim"
+            ".local/state/nvim"
             ".supermaven"
             ".var"
           ];
@@ -22,9 +22,7 @@ let
 
       ];
     })
-    ({ config, pkgs,
-      # lib,
-      ... }: {
+    ({  pkgs, ... }: {
         services.poweralertd.enable = true;
         home.packages = with pkgs; [
           neovim
@@ -35,4 +33,5 @@ let
         fonts.fontconfig.enable = true;
       })
   ];
+
 }

@@ -1,10 +1,9 @@
-{ config, lib, inputs, ... }:
+{ config, lib,  ... }:
 let
   provider = config.clan.core.vars.generators.acme.files.provider.value;
   dnsResorvers = { cloudflare = "1.1.1.1:53"; };
 in {
 
-  imports = [ inputs.clan-core.clanModules.nginx ];
   options.services.nginx.virtualHosts = lib.mkOption {
     type = lib.types.attrsOf (lib.types.submodule ({ name, ... }:
       let

@@ -55,6 +55,12 @@
       repo = "stylix";
       type = "github";
     };
+    ags = {
+      type = "github";
+      owner = "Aylur";
+      repo = "ags";
+      rev = "237601999d65a4663bcbab934f4f6ce1f579d728";
+    };
   };
 
   outputs = _:{};

@@ -18,15 +18,8 @@ in {
           eval = "$(${lib.getExe config.flake-root.package})";
         }
       ];
-      commands = [{
-        help = "Create users secrets";
-        name = "userSecrets";
-        command = "UserSecret.sh";
-
-      }];
       packages = with pkgs; [
         disko
-        config.packages.userSecrets
         sops
         nixos-anywhere
         nixos-facter

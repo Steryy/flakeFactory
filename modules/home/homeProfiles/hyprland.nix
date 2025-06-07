@@ -1,20 +1,10 @@
 {
-  config,
   lib,
   options,
   osConfig,
   ...
 }: {
   config = lib.mkMerge [
-    (lib.mkIf (options ? "persistence") {
-      wayland.windowManager.hyprland.settings.source = ["${config.xdg.configHome}/hypr/monitors.conf"];
-      persistence.state = {
-        files = [".config/hypr/monitors.conf"];
-        directories = [
-          ".config/hyprpanel"
-        ];
-      };
-    })
     {
       wayland.windowManager.hyprland = {
         enable = true;
