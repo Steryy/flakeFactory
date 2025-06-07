@@ -6,15 +6,6 @@
 }: {
   config = lib.mkMerge [
     (
-      lib.optionalAttrs (options ? "persistence")
-      {
-        persistence.cache.directories = [
-          ".config/vesktop"
-        ];
-      }
-    )
-
-    (
       lib.optionalAttrs (! (options.programs ? "nixcord") && options ? "stylix") {
         stylix.targets.vesktop.enable = true;
       }
@@ -29,6 +20,9 @@
     (
       lib.optionalAttrs (options.programs ? "nixcord")
       {
+        xdg.userDirs.extraConfig = {
+          VESKTOP_CONF = ".config/vesktop";
+        };
         programs.nixcord = {
           enable = true; # enable Nixcord. Also installs discord package
           vesktop = {enable = true;};

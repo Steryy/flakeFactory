@@ -67,10 +67,10 @@ let
   ];
 in {
   config = lib.mkMerge [
-    (lib.optionalAttrs (options ? "persistence") {
-      persistence.state.directories = [ ".thunderbird" ];
-    })
     {
+      xdg.userDirs.extraConfig = {
+        THUNDERBIRD_CACHE = ".thunderbird";
+      };
       programs = {
         thunderbird = {
           settings = {
