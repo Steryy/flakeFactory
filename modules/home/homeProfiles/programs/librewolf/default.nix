@@ -22,14 +22,15 @@ in {
 
     })
 
-    (lib.optionalAttrs (options ? "persistence") {
-      persistence.cache.directories = [ ".librewolf" ];
-    })
     (lib.optionalAttrs (options.xdg.mime ? "browsers") {
       xdg.mime.browsers = [ "librewolf.desktop" ];
     })
 
     {
+
+      xdg.userDirs.extraConfig = {
+        THUNDERBIRD_CACHE = ".librewolf";
+      };
       programs.librewolf = {
         enable = true;
         profiles = {
