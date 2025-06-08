@@ -33,8 +33,16 @@ in
             extraModules = with inputs.srvos.nixosModules; [
               server
               mixins-telegraf
-
-              
+              {
+                xdg = {
+                  mime.enable = false;
+                  icons.enable = false;
+                  autostart.enable = false;
+                  sounds.enable = false;
+                  terminal-exec.enable = false;
+                  portal.enable = false;
+                };
+              }
             ];
 
           };

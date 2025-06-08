@@ -132,8 +132,6 @@ in {
             else
               "${user}@${n}";
           };
-            tags =
-              v.tags ;
         } ) le;
     };
   };
