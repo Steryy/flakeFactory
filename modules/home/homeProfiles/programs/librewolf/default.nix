@@ -29,7 +29,7 @@ in {
     {
 
       xdg.userDirs.extraConfig = {
-        THUNDERBIRD_CACHE = ".librewolf";
+        LIBREWOLF_CACHE = ".librewolf";
       };
       programs.librewolf = {
         enable = true;
