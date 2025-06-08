@@ -1,0 +1,12 @@
+on:
+  pull_request:
+  push:
+
+jobs:
+  lints:
+    name: Flake check
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v4
+     - uses: https://github.com/cachix/install-nix-action@v25
+     - run: nix run nixpkgs#omnix -- ci
