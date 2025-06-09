@@ -5,6 +5,7 @@
 }: let
   cloud = {
     shou = {
+      default = "eu-central-1";
       regions = [
         "af-south-1"
         "ap-east-1"
@@ -44,6 +45,7 @@
     };
 
     seirei = {
+      default = "germanywestcentral";
       regions = [
         "southafricanorth"
         "southafricawest"
@@ -128,6 +130,9 @@ in {
     type = lib.types.attrsOf (
       lib.types.submodule {
         options = {
+          default = lib.mkOption {
+            type = lib.types.str;
+          };
           regions = lib.mkOption {
             type = lib.types.listOf (
               lib.types.str
@@ -141,16 +146,23 @@ in {
 
   config = {
     flake.cloudMachines = cloudMachines;
+
+    clan.inventory.machines =
+      lib.mapAttrs (n: v: let
+        def = cloud."${v.type}".default;
+      in {
+        tags =
+          if v.region == null
+          then ["region:${def}"]
+          else [];
+      })
+      cloudMachines;
     clan.machines =
       lib.mapAttrs (n: v: {
         assertions = [
           {
-            assertion = v.region != null;
-            message = "Machine ${n} has no region defined";
-          }
-          {
             assertion =
-              (lib.elem v.region cloud."${v.type}".regions);
+              lib.elem v.region cloud."${v.type}".regions;
             message = "Region ${toString v.region} is not valid for machine ${n}";
           }
         ];
