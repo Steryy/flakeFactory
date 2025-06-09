@@ -55,7 +55,6 @@ in {
 
       terranixConfigurations.terraform = {
         workdir = "terraform";
-        modules = terra;
         terraformWrapper.package = package;
         terraformWrapper.extraRuntimeInputs = [inputs'.clan-core.packages.default];
         terraformWrapper.prefixText = ''

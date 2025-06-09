@@ -158,11 +158,16 @@ in {
       })
       cloudMachines;
     clan.machines =
-      lib.mapAttrs (n: v: {
+      lib.mapAttrs (n: v: let
+        reg =
+          if v.region == null
+          then cloud."${v.type}".default
+          else v.region;
+      in {
         assertions = [
           {
             assertion =
-              lib.elem v.region cloud."${v.type}".regions;
+              lib.elem reg cloud."${v.type}".regions;
             message = "Region ${toString v.region} is not valid for machine ${n}";
           }
         ];

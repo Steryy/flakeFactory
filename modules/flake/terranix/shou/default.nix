@@ -36,6 +36,51 @@ in {
             alias = x;
           })
           regions;
+        resource = {
+          aws_key_pair = forRegions (region: {
+            name = "default-${region}";
+            value = {
+              key_name = "shou";
+              provider = "aws.${region}";
+              public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdo5NQApszwHbzHhN1JxxulAa3YM9m2pDHhwfuFA78o (none)";
+            };
+          });
+          aws_security_group = forRegions (region: {
+            name = "ssh-${region}";
+            value = {
+              name = "Allow ssh";
+              provider = "aws.${region}";
+              description = "Open ssh port";
+              lifecycle = [{create_before_destroy = true;}];
+              ingress = [
+                {
+                  description = "SSH";
+                  from_port = 22;
+                  to_port = 22;
+                  protocol = "tcp";
+                  cidr_blocks = ["0.0.0.0/0"];
+                  ipv6_cidr_blocks = ["::/0"];
+                  prefix_list_ids = [];
+                  security_groups = [];
+                  self = false;
+                }
+              ];
+              egress = [
+                {
+                  description = "Allow all outbound";
+                  from_port = 0;
+                  to_port = 0;
+                  protocol = "-1";
+                  cidr_blocks = ["0.0.0.0/0"];
+                  ipv6_cidr_blocks = ["::/0"];
+                  prefix_list_ids = [];
+                  security_groups = [];
+                  self = false;
+                }
+              ];
+            };
+          });
+        };
         data = {
           aws_ami = forRegArch ({
             arch,
