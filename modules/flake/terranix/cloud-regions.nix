@@ -3,6 +3,7 @@
   config,
   ...
 }: let
+  inherit (lib.local) getSpecialTag;
   cloud = {
     shou = {
       default = "eu-central-1";
@@ -109,15 +110,6 @@
   };
 
   types = lib.attrNames cloud;
-  getSpecialTag = tag: tags: let
-    sp = lib.filter (lib.hasPrefix "${tag}:") tags;
-  in
-    if lib.length sp == 0
-    then null
-    else
-      lib.removePrefix "${tag}:"
-      (lib.head sp);
-
   cloudMachines = lib.pipe config.clan.hosts [
     (lib.filterAttrs (_: v: builtins.any (x: lib.elem x v) types))
     (lib.mapAttrs (_: v: {

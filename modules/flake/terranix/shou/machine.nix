@@ -1,19 +1,14 @@
 {
   lib,
-  config,
   ...
 }: let
-  machines = lib.pipe config.clan.inventory.machines [
-    (lib.filterAttrs (_: v: lib.elem "shou" v.tags))
-  ];
-
-  getSpecialTag = tag: tags:
-    lib.removePrefix "${tag}:"
-    (lib.head (lib.filter (lib.hasPrefix "${tag}:") tags));
+  inherit (lib.local) getSpecialTag;
 in {
   perSystem = {...}: {
     terranix. terranixConfigurations.terraform.modules = [
-      {
+      ({inventory, ...}: let
+        inherit (inventory) machines;
+      in {
         resource.aws_instance =
           lib.mapAttrs (n: v: let
             arch = getSpecialTag "arch" v.tags;
@@ -46,7 +41,7 @@ in {
             };
           })
           machines;
-      }
+      })
     ];
   };
 }

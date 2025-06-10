@@ -1,37 +1,8 @@
 {
   lib,
-  config,
   inputs,
   ...
 }: let
-  getSpecialTag = tag: tags:
-    lib.removePrefix "${tag}:"
-    (lib.head (lib.filter (lib.hasPrefix "${tag}:") tags));
-
-  genMachine = type: file:
-    lib.pipe
-    config.clan.inventory.machines
-    [
-      (lib.filterAttrs (_: v: lib.elem type v.tags))
-      (lib.attrsets.mapAttrsToList (n: v: {
-        hostname = n;
-        type = type;
-        arch = getSpecialTag "arch" v.tags;
-        inherit (v) machineClass tags;
-        inherit  lib;
-
-      }))
-      (map (x: import file x))
-    ];
-
-  terra = let
-    shou = genMachine "shou" ../../terranix/machine/shou.nix;
-  in (lib.optionals (lib.length shou > 0) (
-    shou
-    ++ [
-      ../../terranix/aws.nix
-    ]
-  ));
 in {
   imports = [
     inputs.terranix.flakeModule

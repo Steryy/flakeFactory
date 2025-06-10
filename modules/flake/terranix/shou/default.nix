@@ -3,33 +3,24 @@
   lib,
   ...
 }: let
-  machines = lib.pipe config.clan.inventory.machines [
-    (lib.filterAttrs (_: v: lib.elem "shou" v.tags))
-  ];
-
-  getSpecialTag = tag: tags:
-    lib.removePrefix "${tag}:"
-    (lib.head (lib.filter (lib.hasPrefix "${tag}:") tags));
-  regions = lib.pipe machines [
-    lib.attrValues
-    (map (x: getSpecialTag "region" x.tags))
-    (lib.unique)
-  ];
-  archs = lib.pipe machines [
-    lib.attrValues
-    (map
-      (x: getSpecialTag "arch" x.tags))
-    lib.unique
-  ];
-  forRegArch = f:
-    lib.listToAttrs (lib.attrsets.mapCartesianProduct (x: f x) {
-      arch = archs;
-      region = regions;
-    });
+  inherit (lib.local) terranix;
 in {
   perSystem = {...}: {
-    terranix.terranixConfigurations.terraform.modules = [
-      {
+    terranix.terranixConfigurations.terraform={
+        extraArgs = {
+          inventory = terranix config.clan.inventory "shou";
+        };
+      modules = [
+      ({ inventory, ...}:
+          let 
+          inherit (inventory) regions forRegions archs;
+          forRegArch = f:
+            lib.listToAttrs (lib.mapCartesianProduct (x: f x) {
+              arch = archs;
+              region = regions;
+            });
+          in
+          {
         provider.aws =
           map (x: {
             region = x;
@@ -105,7 +96,8 @@ in {
             };
           });
         };
-      }
+      })
     ];
+  };
   };
 }

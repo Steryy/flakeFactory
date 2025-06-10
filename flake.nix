@@ -55,7 +55,6 @@ treefmt-nix.follows = "treefmt-nix";
   };
 
   outputs = inputs @ {...}: let
-    lib = inputs.nixpkgs.lib;
     haumea = inputs.haumea.lib;
 
     flakeModules =
@@ -66,10 +65,20 @@ treefmt-nix.follows = "treefmt-nix";
           loader = haumea.loaders.path;
         }
       );
+    lib = inputs.nixpkgs.lib;
+    libLocal =
+      lib
+      // {
+        local = import ./lib/local.nix {
+          inherit lib;
+          flakeRoot = ./.;
+        };
+      };
   in
     inputs.flake-parts.lib.mkFlake {
       inherit inputs;
       specialArgs = {
+        lib = libLocal;
         inherit inputs;
         flakeRoot = ./.;
       };
