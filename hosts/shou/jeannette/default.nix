@@ -6,18 +6,7 @@ in {
   };
   modules = [
     {
-      fonts.fontconfig.enable =false;
+      fonts.fontconfig.enable = false;
     }
-    ({
-      inputs,
-      ...
-    }: {
-      config = {
-        zramSwap.enable = true;
-        nixpkgs.pkgs = import inputs.nixpkgs {
-          system = "x86_64-linux";
-        };
-      };
-    })
   ];
 }
