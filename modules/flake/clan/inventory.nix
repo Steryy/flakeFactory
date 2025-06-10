@@ -8,13 +8,6 @@ in
       services = {
         user-password.default = {roles.default.tags = ["kami"];};
         state-version.default = {roles.default.tags = ["all"];};
-        mycelium.default = {
-          roles.peer.tags = [
-            "kami"
-            "villainess"
-          ];
-
-        };
 
         importer = 
           (lib.mapAttrs (n: v: {
@@ -58,13 +51,20 @@ in
         };
         zerotier.default = {
           roles = {
-            controller.machines = [
-              "shou-jeannette" 
-            ];
+            controller = {
+              machines = [
+                "shou-jeannette"
+              ];
+              config = {
+                networkIps = [
+                  "fd5d:bbe3:cbc5:fe6b:f699:935d:bbe3:cbc5"
+                ];
+              };
+            };
             peer = {
               tags = [
                 "kami"
-                "villainess" 
+                "villainess"
               ];
             };
           };
