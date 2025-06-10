@@ -1,15 +1,14 @@
 {
-  modulesPath,
   extraInputs,
   lib,
   hostName,
   ...
 }: {
   imports = [
-    (modulesPath + "/installer/scan/not-detected.nix")
     extraInputs.nixos-generators.nixosModules.amazon
   ];
   security.sudo.execWheelOnly = lib.mkForce false;
-  clan.core.enableRecommendedDefaults = false;
   networking.hostName = lib.mkForce "";
+  boot.loader.grub.enable =  lib.mkForce true ;
+  boot.loader.systemd-boot.enable  =  lib.mkForce false ;
 }
