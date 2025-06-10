@@ -70,13 +70,15 @@ in
           };
         };
         sshd.all.roles.server = {
-          tags = [ "all" ];
-          extraModules = [{
-            users.users.root.openssh.authorizedKeys.keys = [
-              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdo5NQApszwHbzHhN1JxxulAa3YM9m2pDHhwfuFA78o (none)"
-              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEEGCUtdHT8bYJbQTr2V+GXvuLPCAmVEKeG8+uzOVGx steryy@waifu-holo"
-            ];
-          }];
+          tags = ["all"];
+          extraModules = [
+            {
+              users.users.root.openssh.authorizedKeys.keys = lib.local. fileFromGroup {
+                group = "admin";
+                file = "sshkey";
+              };
+            }
+          ];
         };
 
       };
