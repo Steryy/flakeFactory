@@ -21,7 +21,7 @@ in {
               ./_git.nix
               {
                 backend.git = {
-                  user = "Steryy";
+                  owner = "Steryy";
                   repo = "flakeFactory";
                   path = "${name}.state.json";
                 };
