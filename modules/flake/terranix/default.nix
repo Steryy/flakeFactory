@@ -18,6 +18,14 @@ in {
         (lib.types.submodule ({name, ...}: {
           config = {
             modules = [
+              ./_git.nix
+              {
+                backend.git = {
+                  user = "Steryy";
+                  repo = "flakeFactory";
+                  path = "${name}.state.json";
+                };
+              }
             ];
             workdir = "vars/terraform/${name}";
             terraformWrapper.extraRuntimeInputs = [inputs'.clan-core.packages.default];
