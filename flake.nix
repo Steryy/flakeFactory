@@ -115,6 +115,10 @@ treefmt-nix.follows = "treefmt-nix";
           src = ./modules/disko;
         };
         clan = { src = ./modules/clan; };
+        terranix = {
+          src = ./modules/terranix;
+        };
+
       };
       imports =
         flakeModules;
