@@ -29,19 +29,8 @@ in {
       in {
         imports = 
           v.modules  ++ [{
-            options.clan.inventory = {
-              machines = lib.mkOption {
-                type = lib.types.attrs;
-                readOnly = true;
-                default = config.clan.inventory.machines;
-              };
-              tags = lib.mkOption {
-                type = lib.types.listOf lib.types.str;
-                readOnly = true;
-                default = tags;
-              };
-            };
             config = { 
+              clan.inventory.tags = tags;
               _module.args.hostName = n;
               users.defaultUser = user;
             };

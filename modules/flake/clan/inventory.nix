@@ -5,6 +5,17 @@ in
 {
   clan = {
     inventory = {
+      instances = {
+        zt = {
+          module = {
+            name = "zerotier";
+            input = "clan-core";
+          };
+          roles.peer.tags.all = {};
+          roles.controller.machines.shou-jeannette = {};
+        };
+
+      };
       services = {
         user-password.default = {roles.default.tags = ["kami"];};
         state-version.default = {roles.default.tags = ["all"];};
@@ -28,15 +39,22 @@ in
 
           }) nixModules) //
           {
+
+          all.roles.default = {
+              tags = ["all"];
+              extraModules = [
+                ../../options.nix
+                {
+                  clan.inventory.machines =config.clan.inventory.machines ;
+                }
+              ];
+          };
           type-server.roles.default = {
             tags = [ "type:server"];
             extraModules = with inputs.srvos.nixosModules; [
               server
               mixins-telegraf
-
-              
             ];
-
           };
           type-desktop.roles.default = {
             tags = ["type:desktop"];
@@ -46,19 +64,6 @@ in
               mixins-nix-experimental
             ];
 
-          };
-        };
-        zerotier.default = {
-          roles = {
-            controller.machines = [
-              "shou-jeannette" 
-            ];
-            peer = {
-              tags = [
-                "kami"
-                "villainess" 
-              ];
-            };
           };
         };
         sshd.all.roles.server = {
