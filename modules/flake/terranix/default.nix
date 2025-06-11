@@ -12,10 +12,40 @@ in {
     pkgs,
     ...
   }: {
+    config = {
+      terranix.exportDevShells = false;
+    };
     options.terranix.terranixConfigurations = lib.mkOption {
       type =
         lib.types.attrsOf
-        (lib.types.submodule ({name, ...}: {
+        (lib.types.submodule ({name, ...} @ submod: let
+          mkTfScript = name: text:
+            pkgs.writeShellApplication {
+              inherit name;
+              runtimeInputs = [submod.config.result.terraformWrapper];
+              text = ''
+                mkdir -p ${submod.config.workdir}
+                ln -sf ${submod.config.result.terraformConfiguration} ${submod.config.workdir}/config.tf.json
+                ${text}
+              '';
+            };
+          tfBinaryName = submod.config.result.terraformWrapper.meta.mainProgram;
+        in {
+          options = {
+            result = lib.mkOption {
+              type = lib.types.submodule ({options, ...}: {
+                config = {
+                  scripts =
+                    options.scripts.default
+                    // {
+                      program = mkTfScript "program" ''
+                        ${tfBinaryName} "$@"
+                      '';
+                    };
+                };
+              });
+            };
+          };
           config = {
             modules = [
               ./_git.nix
