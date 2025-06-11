@@ -1,21 +1,43 @@
-{inputs,config, lib, ...}:
-let
-  nixModules = config.haumea.clan.tags or {};
-in 
 {
+  inputs,
+  config,
+  lib,
+  ...
+}: let
+  nixModules = config.haumea.clan.tags or {};
+in {
   clan = {
     inventory = {
-      instances = {
-        zt = {
-          module = {
-            name = "zerotier";
-            input = "clan-core";
+      instances =
+        {
+          zt = {
+            module = {
+              name = "zerotier";
+              input = "clan-core";
+            };
+            roles.peer.tags.all = {};
+            roles.controller.machines.shou-jeannette = {};
           };
-          roles.peer.tags.all = {};
-          roles.controller.machines.shou-jeannette = {};
-        };
-
-      };
+        }
+        // (lib.mapAttrs' (n: v: {
+            name = "import-${n}";
+            value = {
+              module = {
+                name = "importer";
+                input = "clan-core";
+              };
+              roles.default = {
+                extraModules =
+                  lib.collect (x: lib.isPath x)
+                  (lib.filterAttrs (n: _: (n == "required") || n == "default") v);
+                tags = {
+                  "${n}" = {
+                  };
+                };
+              };
+            };
+          })
+          nixModules);
       services = {
         user-password.default = {roles.default.tags = ["kami"];};
         state-version.default = {roles.default.tags = ["all"];};
@@ -24,33 +46,20 @@ in
             "kami"
             "villainess"
           ];
-
         };
 
-        importer = 
-          (lib.mapAttrs (n: v: {
-            roles.default = {
-              tags = [n];
-              extraModules = 
-                lib.collect (x: lib.isPath x) 
-                (lib.filterAttrs (n: _: (n == "required") || n == "default"   ) v )
-                ;
-            };
-
-          }) nixModules) //
-          {
-
+        importer = {
           all.roles.default = {
-              tags = ["all"];
-              extraModules = [
-                ../../options.nix
-                {
-                  clan.inventory.machines =config.clan.inventory.machines ;
-                }
-              ];
+            tags = ["all"];
+            extraModules = [
+              ../../options.nix
+              {
+                clan.inventory.machines = config.clan.inventory.machines;
+              }
+            ];
           };
           type-server.roles.default = {
-            tags = [ "type:server"];
+            tags = ["type:server"];
             extraModules = with inputs.srvos.nixosModules; [
               server
               mixins-telegraf
@@ -63,19 +72,19 @@ in
               mixins-systemd-boot
               mixins-nix-experimental
             ];
-
           };
         };
         sshd.all.roles.server = {
-          tags = [ "all" ];
-          extraModules = [{
-            users.users.root.openssh.authorizedKeys.keys = [
-              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdo5NQApszwHbzHhN1JxxulAa3YM9m2pDHhwfuFA78o (none)"
-              "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEEGCUtdHT8bYJbQTr2V+GXvuLPCAmVEKeG8+uzOVGx steryy@waifu-holo"
-            ];
-          }];
+          tags = ["all"];
+          extraModules = [
+            {
+              users.users.root.openssh.authorizedKeys.keys = [
+                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPdo5NQApszwHbzHhN1JxxulAa3YM9m2pDHhwfuFA78o (none)"
+                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEEEGCUtdHT8bYJbQTr2V+GXvuLPCAmVEKeG8+uzOVGx steryy@waifu-holo"
+              ];
+            }
+          ];
         };
-
       };
     };
   };
