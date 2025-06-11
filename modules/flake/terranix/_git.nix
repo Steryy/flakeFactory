@@ -3,8 +3,8 @@
   config,
   ...
 }: let
-  cfg = config.backend.git;
-  adr = "http://localhost:${toString cfg.port}/?type=git&repository=${cfg.user}@${cfg.host}:${cfg.owner}/${cfg.repo}&ref=${cfg.ref}&state=${cfg.path}";
+  getAddress = cfg: "http://localhost:${toString cfg.port}/?type=git&repository=${cfg.user}@${cfg.host}:${cfg.owner}/${cfg.repo}&ref=${cfg.ref}&state=${cfg.path}";
+
   gitSubmodule = with lib;
     types.submodule ({config, ...}: {
       config = lib.mkMerge [
@@ -51,14 +51,33 @@ in {
   };
   options.remote_state.git = {
     default = {};
-    type = with lib.types; attrsOf gitSubmodule;
+    type = with lib.types; attrsOf (gitSubmodule);
   };
-  config = lib.mkIf (cfg != null) {
-    terraform.backend.http = let
-    in {
-      address = adr;
-      lock_address = adr;
-      unlock_address = adr;
+  config = let
+    backend = lib.mkIf (config.backend.git != null) {
+      terraform.backend.http = let
+        adr = getAddress config.backend.git;
+      in {
+        address = adr;
+        lock_address = adr;
+        unlock_address = adr;
+      };
     };
-  };
+
+    remote = lib. mkIf (config.remote_state.git != {}) {
+      data."terraform_remote_state" =
+        lib. mapAttrs
+        (name: value: {
+          config = {
+            address = getAddress value;
+          };
+          backend = "http";
+        })
+        config.remote_state.git;
+    };
+  in
+    lib.mkMerge [
+      backend
+      # remote
+    ];
 }
