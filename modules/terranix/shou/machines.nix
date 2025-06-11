@@ -1,14 +1,12 @@
 {
   lib,
+  inventory,
+  localLib,
   ...
 }: let
-  inherit (lib.local) getSpecialTag;
+  inherit (inventory) machines;
+  inherit (localLib) getSpecialTag;
 in {
-  perSystem = {...}: {
-    terranix. terranixConfigurations.terraform.modules = [
-      ({inventory, ...}: let
-        inherit (inventory) machines;
-      in {
         resource.aws_instance =
           lib.mapAttrs (n: v: let
             arch = getSpecialTag "arch" v.tags;
@@ -41,7 +39,4 @@ in {
             };
           })
           machines;
-      })
-    ];
-  };
-}
+      }

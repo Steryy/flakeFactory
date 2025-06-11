@@ -1,27 +1,16 @@
-
 {
-  config,
+  inventory,
   lib,
   ...
 }: let
-  inherit (lib.local) terranix;
+  inherit (inventory) regions forRegions archs;
+
+  forRegArch = f:
+    lib.listToAttrs (lib.mapCartesianProduct (x: f x) {
+      arch = archs;
+      region = regions;
+    });
 in {
-  perSystem = {...}: {
-    terranix.terranixConfigurations.terraform={
-        extraArgs = {
-          inventory = terranix config.clan.inventory "shou";
-        };
-      modules = [
-      ({ inventory, ...}:
-          let 
-          inherit (inventory) regions forRegions archs;
-          forRegArch = f:
-            lib.listToAttrs (lib.mapCartesianProduct (x: f x) {
-              arch = archs;
-              region = regions;
-            });
-          in
-          {
         provider.aws =
           map (x: {
             region = x;
@@ -40,7 +29,6 @@ in {
           aws_security_group = forRegions (region: {
             name = "ssh-${region}";
             value = {
-              name = "Allow ssh";
               provider = "aws.${region}";
               description = "Open ssh port";
               lifecycle = [{create_before_destroy = true;}];
@@ -96,10 +84,5 @@ in {
               ];
             };
           });
-        };
-      })
-    ];
-  };
   };
 }
-
