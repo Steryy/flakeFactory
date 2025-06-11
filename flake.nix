@@ -43,13 +43,10 @@ treefmt-nix.follows = "treefmt-nix";
     };
 
     terranix = {
-      url = "github:Enzime/terranix/terranix-plus";
+      url = "github:terranix/terranix";
       inputs = {
-        bats-assert.follows = "";
-        bats-support.follows = "";
         flake-parts.follows = "flake-parts";
         nixpkgs.follows = "nixpkgs";
-        terranix-examples.follows = "";
       };
     };
   };
