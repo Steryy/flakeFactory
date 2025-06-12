@@ -26,14 +26,6 @@
         "-19"
         "-T0"
       ];
-      #systemd.enable = true;
-
-      # kernelModules = [
-      #         "hv_vmbus" # for hyper-V
-      #         "hv_netvsc"
-      #         "hv_utils"
-      #         "hv_storvsc"
-      # ];
     };
   };
 }
