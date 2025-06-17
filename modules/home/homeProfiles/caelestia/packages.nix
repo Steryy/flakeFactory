@@ -23,6 +23,7 @@
       # sha256 = "196z5hgd8d3vpa4bkxizgxnc3fj4aakais3i6a30ankanya4df5j";
     };
 
+    patches = [ ./patches/noscheme.patch ./patches/storage.patch ./patches/uptime.patch ];
     buildInputs = with pkgs; [
       # cfg.finalPackage
       gcc
