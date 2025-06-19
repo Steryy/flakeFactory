@@ -1,7 +1,5 @@
 {
   config,
-  pkgs,
-  inputs,
   lib,
   ...
 }: {
@@ -9,15 +7,11 @@
   xdg.configFile = {
     # Main caelestia shell configuration
     "quickshell/caelestia" = {
-      source = "${config.programs.quickshell.celestialShell}/share/caelestia";
+      source = "${config.services.caelestia-shell.finalPackage}/share/caelestia";
       recursive = true;
     };
 
     # Fish completions (our fixed version)
-    "fish/completions/caelestia.fish" = {
-      source = ./caelestia-completions.fish;
-    };
-
     # Your custom scripts.json for toggle workspaces
     "caelestia/shell.json" = {
       text =
@@ -39,13 +33,6 @@
   };
 
   # Data files
-  xdg.dataFile = {
-    # Scripts directory (from the packaged scripts)
-    "caelestia/scripts" = {
-      source = "${config.programs.quickshell.caelestia-scripts}/share/caelestia-scripts";
-      recursive = true;
-    };
-  };
 
   # Environment variables
   home.sessionVariables = {

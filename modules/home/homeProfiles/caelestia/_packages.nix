@@ -1,16 +1,15 @@
 {
-  config,
   pkgs,
   inputs,
   lib,
   ...
 }: let
-  cfg = config.programs.quickshell;
   mypython = pkgs.python3.withPackages (ps:
     with ps; [
       materialyoucolor
       pillow
     ]);
+
   caelestia-shell = pkgs.clangStdenv.mkDerivation rec {
     pname = "caelestia-shell";
     version = "main";
@@ -23,7 +22,6 @@
       # sha256 = "196z5hgd8d3vpa4bkxizgxnc3fj4aakais3i6a30ankanya4df5j";
     };
 
-    patches = [ ./patches/noscheme.patch ./patches/storage.patch ./patches/uptime.patch ];
     buildInputs = with pkgs; [
       # cfg.finalPackage
       gcc
@@ -36,22 +34,21 @@
       makeWrapper
       pkg-config
     ];
+
     buildPhase = ''
       mkdir -p $out/bin
       g++ -std=c++17 -O2 assets/beat_detector.cpp -o $out/bin/beat_detector \
         $(pkg-config --cflags --libs libpipewire-0.3 libspa-0.2 aubio)
     '';
-    fixupPhase = ''
 
+    fixupPhase = ''
       for prog in $(find $out -type f -name "*.qml" ); do
-          if grep -q 'app2unit' $prog ; then
-            substituteInPlace $prog --replace 'app2unit' "${cfg.desktopRunCmd}"
-          fi
           if grep -qF '/usr/lib/caelestia/beat_detector' $prog ; then
             substituteInPlace $prog --replace '/usr/lib/caelestia/beat_detector' "$out/bin/beat_detector"
           fi
       done
     '';
+
     installPhase = ''
       mkdir -p $out/bin
       mkdir -p $out/share/caelestia
@@ -180,30 +177,52 @@
         --prefix QML2_IMPORT_PATH : "${pkgs.qt6.qtdeclarative}/${pkgs.qt6.qtbase.qtQmlPrefix}" \
         --prefix PATH : ${lib.makeBinPath [pkgs.fd pkgs.coreutils]}
     '';
-in {
-  options.programs.quickshell = {
-    finalPackage = lib.mkOption {
-      type = lib.types.package;
-      default = quickshell-wrapped;
-      description = "The wrapped quickshell package with Qt dependencies";
-    };
-    pythonPackage = lib.mkOption {
-      type = lib.types.package;
-      default = mypython;
-    };
-    desktopRunCmd = lib.mkOption {
-      type = lib.types.str;
-      default = "${pkgs.gtk3}/bin/gtk-launch";
-    };
-    celestialShell = lib.mkOption {
-      type = lib.types.package;
-      default = caelestia-shell;
-    };
 
-    caelestia-scripts = lib.mkOption {
-      type = lib.types.package;
-      default = caelestia-scripts;
-      description = "The caelestia scripts package";
-    };
-  };
+  caelestia-quickshell = pkgs. writeScriptBin "caelestia-quickshell" ''
+    #!${pkgs.fish}/bin/fish
+
+    # Override for caelestia shell commands to work with quickshell
+    set -l original_caelestia ${caelestia-scripts}/bin/caelestia
+
+    if test "$argv[1]" = "shell" -a -n "$argv[2]"
+        set -l cmd $argv[2]
+        set -l args $argv[3..]
+
+        switch $cmd
+            case "show" "toggle"
+                if test -n "$args[1]"
+                    exec qs -c caelestia ipc call drawers $cmd $args[1]
+                else
+                    echo "Usage: caelestia shell $cmd <drawer>"
+                    exit 1
+                end
+            case "media"
+                if test -n "$args[1]"
+                    set -l action $args[1]
+                    switch $action
+                        case "play-pause"
+                            exec qs -c caelestia ipc call mpris playPause
+                        case '*'
+                            exec qs -c caelestia ipc call mpris $action
+                    end
+                else
+                    echo "Usage: caelestia shell media <action>"
+                    exit 1
+                end
+            case '*'
+                # For other shell commands, try the original
+                exec $original_caelestia $argv
+        end
+    else
+        # For non-shell commands, use the original
+        exec $original_caelestia $argv
+    end
+  '';
+in {
+  inherit
+    caelestia-shell
+    caelestia-scripts
+    quickshell-wrapped
+    caelestia-quickshell
+    ;
 }
