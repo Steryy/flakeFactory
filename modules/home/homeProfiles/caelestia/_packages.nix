@@ -17,17 +17,20 @@
     src = pkgs.fetchFromGitHub {
       owner = "caelestia-dots";
       repo = "shell";
-      rev = "ee0f243ca36cad45718424433254304d53059df8";
-      hash = "sha256-U45DVKm2Tso0NAbvv/eyZ8O46s/9hd20sc70EdYGS5c=";
-      # sha256 = "196z5hgd8d3vpa4bkxizgxnc3fj4aakais3i6a30ankanya4df5j";
+      rev = "98eb7c16798c2e481d4b8d90a97e54433466fb2a";
+      hash = "sha256-eTo5rbVwhOHFO8E40tXX5ecrA6EL+ShBeqtw9gd6B7o=";
     };
 
     buildInputs = with pkgs; [
       # cfg.finalPackage
-      gcc
-      pipewire.dev
-      libspatialaudio
-      aubio
+      # git
+      # curl
+      # jq
+      # material-symbols
+      # ibm-plex
+      # fd
+      # material-design-icons # for material-symbols
+      # jetbrains-mono
     ];
 
     nativeBuildInputs = with pkgs; [
@@ -63,9 +66,8 @@
     src = pkgs.fetchFromGitHub {
       owner = "caelestia-dots";
       repo = "cli";
-      rev = "main";
-      hash = "sha256-fGmOP1pVNZ9SXZIzEjUxWDXpUPBIFI/oRyINSUTarcM=";
-      # sha256 = "196z5hgd8d3vpa4bkxizgxnc3fj4aakais3i6a30ankanya4df5j";
+      rev = "2664749c75417b947efdd9ab1b136aaa0ade42b2";
+      hash = "sha256-kHbGBqXZS8M38CtMng2b/88+l1Od9FfRijycHTfDGZ4=";
     };
 
     nativeBuildInputs = with pkgs; [
