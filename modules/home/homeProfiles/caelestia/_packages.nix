@@ -21,21 +21,13 @@
       hash = "sha256-eTo5rbVwhOHFO8E40tXX5ecrA6EL+ShBeqtw9gd6B7o=";
     };
 
-    buildInputs = with pkgs; [
-      # cfg.finalPackage
-      # git
-      # curl
-      # jq
-      # material-symbols
-      # ibm-plex
-      # fd
-      # material-design-icons # for material-symbols
-      # jetbrains-mono
-    ];
-
     nativeBuildInputs = with pkgs; [
+      gcc
       makeWrapper
       pkg-config
+      pipewire.dev
+      libspatialaudio
+      aubio
     ];
 
     buildPhase = ''
@@ -167,18 +159,6 @@
   };
 
   # Wrap quickshell with Qt dependencies and required tools in PATH
-  quickshell-wrapped =
-    pkgs.runCommand "quickshell-wrapped" {
-      nativeBuildInputs = [pkgs.makeWrapper];
-    } ''
-      mkdir -p $out/bin
-      makeWrapper ${inputs.quickshell.packages.${pkgs.system}.default}/bin/qs $out/bin/qs \
-        --prefix QT_PLUGIN_PATH : "${pkgs.qt6.qtbase}/${pkgs.qt6.qtbase.qtPluginPrefix}" \
-        --prefix QT_PLUGIN_PATH : "${pkgs.qt6.qt5compat}/${pkgs.qt6.qtbase.qtPluginPrefix}" \
-        --prefix QML2_IMPORT_PATH : "${pkgs.qt6.qt5compat}/${pkgs.qt6.qtbase.qtQmlPrefix}" \
-        --prefix QML2_IMPORT_PATH : "${pkgs.qt6.qtdeclarative}/${pkgs.qt6.qtbase.qtQmlPrefix}" \
-        --prefix PATH : ${lib.makeBinPath [pkgs.fd pkgs.coreutils]}
-    '';
 
   caelestia-quickshell = pkgs. writeScriptBin "caelestia-quickshell" ''
     #!${pkgs.fish}/bin/fish
@@ -224,7 +204,6 @@ in {
   inherit
     caelestia-shell
     caelestia-scripts
-    quickshell-wrapped
     caelestia-quickshell
     ;
 }

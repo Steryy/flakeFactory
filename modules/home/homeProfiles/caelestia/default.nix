@@ -18,18 +18,28 @@ in {
       type = lib.types.nullOr lib.types.package;
       default = null;
     };
+
+    quickshellPackage = lib.mkOption {
+      type = lib.types.package;
+      default =
+        inputs.quickshell.packages."${pkgs.system}".default;
+    };
+
+    quickshellFinal = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = null;
+    };
+
+    extraPackages = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.package
+      );
+      default = [];
+    };
     packageChanges = {
       patches = lib.mkOption {
         type = lib.types.listOf lib.types.path;
         default = [];
-      };
-
-      cmdOverrides = lib.mkOption {
-        type = lib.types.attrsOf (
-          lib.types.nullOr
-          lib.types.str
-        );
-        default = {};
       };
     };
   };
@@ -38,87 +48,51 @@ in {
     ./config.nix # Configuration files and environment setup
   ];
   config = {
-    services.caelestia-shell.finalPackage = let
-      overrides = lib.mapAttrsToList (n: v:
-        #bash
-        ''
-          if grep -qF '${n}' $prog ; then
-            substituteInPlace $prog --replace '${n}' "${v}"
-          fi
-        '')
-      (lib.filterAttrs (_: v: v != null) cfg.packageChanges.cmdOverrides);
-    in
-      cfg.package.overrideAttrs (oldAttrs: {
-        patches =
-          # []
-          (oldAttrs.patches or []) ++ cfg.packageChanges.patches;
-        fixupPhase = ''
-
-          for prog in $(find $out -type f -name "*.qml" ); do
-            ${lib.concatStringsSep "\n" overrides}
-          done
-        '';
-      });
+    services.caelestia-shell.finalPackage = cfg.package.overrideAttrs (oldAttrs: {
+      patches =
+        (oldAttrs.patches or []) ++ cfg.packageChanges.patches;
+    });
     services.caelestia-shell.packageChanges.patches = [
       ./patches/delbg.patch
-      ./patches/noscheme.patch
+      # ./patches/noscheme.patch
       ./patches/storage.patch
       ./patches/uptime.patch
     ];
-    services.caelestia-shell.packageChanges.cmdOverrides =
-      lib.mapAttrs (n: v:
-        if v == null
-        then "${pkgs."${n}"}/bin/${n}"
-        else v)
-      {
-        fish = null;
-        sensors = "${pkgs.lm_sensors}/bin/sensors";
-        app2unit = "${pkgs.gtk3}/bin/gtk-launch";
-      };
 
-    home.packages = with pkgs; [
-      packages.quickshell-wrapped
-      # config.programs.quickshell.finalPackage # Our wrapped quickshell
-      # config.programs.quickshell.caelestia-scripts
-      # Qt dependencies
-      qt6.qt5compat
-      qt6.qtdeclarative
+    services.caelestia-shell.quickshellFinal =
+      pkgs.runCommand "quickshell-wrapped" {
+        nativeBuildInputs = [pkgs.makeWrapper];
+      } ''
+        mkdir -p $out/bin
+        makeWrapper ${inputs.quickshell.packages.${pkgs.system}.default}/bin/qs $out/bin/qs \
+          --prefix QT_PLUGIN_PATH : "${pkgs.qt6.qtbase}/${pkgs.qt6.qtbase.qtPluginPrefix}" \
+          --prefix QT_PLUGIN_PATH : "${pkgs.qt6.qt5compat}/${pkgs.qt6.qtbase.qtPluginPrefix}" \
+          --prefix QML2_IMPORT_PATH : "${pkgs.qt6.qt5compat}/${pkgs.qt6.qtbase.qtQmlPrefix}" \
+          --prefix QML2_IMPORT_PATH : "${pkgs.qt6.qtdeclarative}/${pkgs.qt6.qtbase.qtQmlPrefix}" \
+          --prefix PATH : ${lib.makeBinPath ([pkgs.fd pkgs.coreutils] ++ cfg.extraPackages)} 
+      '';
 
-      # Runtime dependencies
-      # hyprpaper
-      imagemagick
-      wl-clipboard
-      fuzzel
-      socat
-      foot
-      jq
-      python3
-      # python3Packages.materialyoucolor
-      # python3Packages.
-
-      grim
-      wayfreeze
-      wl-screenrec
-      dart-sass
-      gtk3
-      # inputs.astal.packages.${pkgs.system}.default
-
-      # Additional dependencies
+    services.caelestia-shell.extraPackages = with pkgs; [
       lm_sensors
+      fish
+      (writeShellScriptBin "app2unit" ''
+        ${gtk3}/bin/gtk-launch "$@"
+
+      '')
       curl
-      material-symbols
-      # material-symbols
-      nerd-fonts.jetbrains-mono
-      ibm-plex
-      fd
       cava
+      ibm-plex
+      imagemagick
       networkmanager
       bluez
-      ddcutil
       brightnessctl
-      packages. caelestia-quickshell
+    ];
 
-      # Wrapper for caelestia to work with quickshell
+    home.packages = with pkgs; [
+      cfg.quickshellFinal
+      material-symbols
+      material-design-icons
+      packages. caelestia-quickshell
     ];
 
     # Systemd service
@@ -129,7 +103,7 @@ in {
       };
       Service = {
         Type = "exec";
-        ExecStart = "${packages.quickshell-wrapped}/bin/qs -c caelestia";
+        ExecStart = "${config.services.caelestia-shell.quickshellFinal}/bin/qs -c caelestia";
         Restart = "on-failure";
         Slice = "app-graphical.slice";
       };
@@ -142,15 +116,6 @@ in {
     home.shellAliases = {
       caelestia-shell = "qs -c caelestia";
       caelestia-edit = "cd ${config.xdg.configHome}/quickshell/caelestia && $EDITOR";
-      caelestia = "${pkgs.writeShellScript "caelestia" ''
-        if [[ "$1" == "wallpaper" && "$2" == "-f" ]]; then
-          echo "Nuts"
-          exit 0
-
-        fi
-        caelestia-quickshell "$@"
-
-      ''}";
     };
   };
 
