@@ -1,43 +1,68 @@
-{inputs,config, lib, ...}:
-let
-  nixModules = config.haumea.clan.tags or {};
-in 
 {
+  inputs,
+  config,
+  lib,
+  ...
+}: let
+  nixModules = config.haumea.clan.tags or {};
+in {
   clan = {
     inventory = {
+      instances =
+        {
+          zt = {
+            module = {
+              name = "zerotier";
+              input = "clan-core";
+            };
+            roles.peer.tags.all = {};
+            roles.moon.machines ={};
+            roles.controller.machines.shou-jeannette = {
+              settings = {
+                allowedIps = [];
+              };
+            };
+          };
+        }
+        // (lib.mapAttrs' (n: v: {
+            name = "import-${n}";
+            value = {
+              module = {
+                name = "importer";
+                input = "clan-core";
+              };
+              roles.default = {
+                extraModules =
+                  lib.collect (x: lib.isPath x)
+                  (lib.filterAttrs (n: _: (n == "required") || n == "default") v);
+                tags = {
+                  "${n}" = {
+                  };
+                };
+              };
+            };
+          })
+          nixModules);
       services = {
         user-password.default = {roles.default.tags = ["kami"];};
         state-version.default = {roles.default.tags = ["all"];};
 
-        importer = 
-          (lib.mapAttrs (n: v: {
-            roles.default = {
-              tags = [n];
-              extraModules = 
-                lib.collect (x: lib.isPath x) 
-                (lib.filterAttrs (n: _: (n == "required") || n == "default"   ) v )
-                ;
-            };
-
-          }) nixModules) //
-          {
+        importer = {
+          all.roles.default = {
+            tags = ["all"];
+            extraModules = [
+              ../../options.nix
+              {
+                clan.inventory.machines = config.clan.inventory.machines;
+              }
+            ];
+          };
           type-server.roles.default = {
-            tags = [ "type:server"];
+            tags = ["type:server"];
             extraModules = with inputs.srvos.nixosModules; [
               server
               mixins-telegraf
-              {
-                xdg = {
-                  mime.enable = false;
-                  icons.enable = false;
-                  autostart.enable = false;
-                  sounds.enable = false;
-                  terminal-exec.enable = false;
-                  portal.enable = false;
-                };
-              }
             ];
-
           };
           type-desktop.roles.default = {
             tags = ["type:desktop"];
@@ -46,27 +71,6 @@ in
               mixins-systemd-boot
               mixins-nix-experimental
             ];
-
-          };
-        };
-        zerotier.default = {
-          roles = {
-            controller = {
-              machines = [
-                "shou-jeannette"
-              ];
-              config = {
-                networkIps = [
-                  "fd5d:bbe3:cbc5:fe6b:f699:935d:bbe3:cbc5"
-                ];
-              };
-            };
-            peer = {
-              tags = [
-                "kami"
-                "villainess"
-              ];
-            };
           };
         };
         sshd.all.roles.server = {
@@ -80,7 +84,6 @@ in
             }
           ];
         };
-
       };
     };
   };

@@ -1,7 +1,6 @@
 {
   extraInputs,
   lib,
-  hostName,
   ...
 }: {
   imports = [

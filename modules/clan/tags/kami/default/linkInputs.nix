@@ -13,7 +13,7 @@
   flakes = filterAttrs (name: value: value ? outputs) (inputs // extraInputs);
 
   nixRegistry =
-    builtins.mapAttrs
+    lib.mapAttrs
     (name: v: {flake = v;})
     flakes;
 
@@ -34,9 +34,10 @@ in {
     ];
 
     nix.registry =
+      lib.mkForce (
       if cfg.generateRegistryFromInputs
       then nixRegistry
-      else {self.flake = flakes.self;};
+      else {self.flake = flakes.self;});
 
     environment.etc = mkIf (cfg.linkInputs || cfg.generateNixPathFromInputs) (mapAttrs'
       (name: value: {

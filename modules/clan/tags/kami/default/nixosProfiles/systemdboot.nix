@@ -1,11 +1,5 @@
-{
-  lib,
-  pkgs,
-  ...
-}: {
+ {
   boot = {
-    tmp.useTmpfs = true;
-    kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
@@ -26,14 +20,6 @@
         "-19"
         "-T0"
       ];
-      #systemd.enable = true;
-
-      # kernelModules = [
-      #         "hv_vmbus" # for hyper-V
-      #         "hv_netvsc"
-      #         "hv_utils"
-      #         "hv_storvsc"
-      # ];
     };
   };
 }
