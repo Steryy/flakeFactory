@@ -16,7 +16,7 @@ in {
       ]);
     in {
 
-      terranixConfigurations.shou = {
+      terranixConfigurations.terraform-shou = {
         terraformWrapper.package = package;
         modules = lib.collect (x: lib.isPath x ) config.haumea.terranix.shou;
         extraArgs = {

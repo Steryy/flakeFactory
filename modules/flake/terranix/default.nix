@@ -30,6 +30,7 @@ in {
               '';
             };
           tfBinaryName = submod.config.result.terraformWrapper.meta.mainProgram;
+          name' = lib.removePrefix "terraform-" name;
         in {
           options = {
             result = lib.mkOption {
@@ -53,11 +54,11 @@ in {
                 backend.git = {
                   owner = "Steryy";
                   repo = "flakeFactory";
-                  path = "${name}.state.json";
+                  path = "${name'}.state.json";
                 };
               }
             ];
-            workdir = "vars/terraform/${name}";
+            workdir = "vars/terraform/${name'}";
             terraformWrapper.extraRuntimeInputs = [inputs'.clan-core.packages.default];
             terraformWrapper. suffixText = ''
               ${pkgs.terraform-backend-git}/bin/terraform-backend-git stop
