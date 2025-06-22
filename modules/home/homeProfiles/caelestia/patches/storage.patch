@@ -1,0 +1,13 @@
+diff --git a/modules/dashboard/dash/Resources.qml b/modules/dashboard/dash/Resources.qml
+index 9a1f07a..32e5673 100644
+--- a/modules/dashboard/dash/Resources.qml
++++ b/modules/dashboard/dash/Resources.qml
+@@ -26,7 +26,7 @@ Row {
+     }
+ 
+     Resource {
+-        icon: "hard_disk"
++        icon: "storage"
+         value: SystemUsage.storagePerc
+         colour: Colours.palette.m3tertiary
+     }
