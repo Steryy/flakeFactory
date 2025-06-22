@@ -13,4 +13,4 @@ jobs:
     - uses: actions/checkout@v4
     - uses: wimpysworld/nothing-but-nix@main     
     - uses: DeterminateSystems/determinate-nix-action@main
-    - run: nix run nixpkgs#omnix -- ci
+    - run: nix flake check
