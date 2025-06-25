@@ -1,11 +1,12 @@
 {
   config,
   pkgs,
+  extraInputs,
   inputs,
   lib,
   ...
 }: let
-  packages = import ./_packages.nix {inherit pkgs inputs lib;};
+  packages = import ./_packages.nix {inherit pkgs  lib;};
   cfg = config.services.caelestia-shell;
 in {
   options.services.caelestia-shell = {
@@ -22,7 +23,7 @@ in {
     quickshellPackage = lib.mkOption {
       type = lib.types.package;
       default =
-        inputs.quickshell.packages."${pkgs.system}".default;
+        extraInputs.quickshell.packages."${pkgs.system}".default;
     };
 
     quickshellFinal = lib.mkOption {
@@ -64,7 +65,7 @@ in {
         nativeBuildInputs = [pkgs.makeWrapper];
       } ''
         mkdir -p $out/bin
-        makeWrapper ${inputs.quickshell.packages.${pkgs.system}.default}/bin/qs $out/bin/qs \
+        makeWrapper ${cfg.quickshellPackage}/bin/qs $out/bin/qs \
           --prefix QT_PLUGIN_PATH : "${pkgs.qt6.qtbase}/${pkgs.qt6.qtbase.qtPluginPrefix}" \
           --prefix QT_PLUGIN_PATH : "${pkgs.qt6.qt5compat}/${pkgs.qt6.qtbase.qtPluginPrefix}" \
           --prefix QML2_IMPORT_PATH : "${pkgs.qt6.qt5compat}/${pkgs.qt6.qtbase.qtQmlPrefix}" \

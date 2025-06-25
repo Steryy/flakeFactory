@@ -3,6 +3,11 @@
   lib,
   ...
 }: {
+  xdg.userDirs.extraConfig = {
+    CAELESTIA_DATA = ".local/share/caelestia";
+    CAELESTIA_STATE = ".local/state/caelestia";
+    CAELESTIA_CONFIG = ".config/caelestia";
+  };
   # Configuration files
   xdg.configFile = {
     # Main caelestia shell configuration
@@ -13,23 +18,23 @@
 
     # Fish completions (our fixed version)
     # Your custom scripts.json for toggle workspaces
-    "caelestia/shell.json" = {
-      text =
-        #json
-        ''
-          {
-            "bar":{
-              "workspaces":{
-                "showWindows": false,
-                "occupiedLabel": null,
-                "label": null ,
-                "occupiedBg": false,
-                "activeTrail":true
-              }
-            }
-          }
-        '';
-    };
+    # "caelestia/shell.json" = {
+    #   text =
+    #     #json
+    #     ''
+    #       {
+    #         "bar":{
+    #           "workspaces":{
+    #             "showWindows": false,
+    #             "occupiedLabel": null,
+    #             "label": null ,
+    #             "occupiedBg": false,
+    #             "activeTrail":true
+    #           }
+    #         }
+    #       }
+    #     '';
+    # };
   };
 
   # Data files
