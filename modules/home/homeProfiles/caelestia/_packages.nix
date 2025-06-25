@@ -1,6 +1,5 @@
 {
   pkgs,
-  inputs,
   lib,
   ...
 }: let
@@ -17,8 +16,8 @@
     src = pkgs.fetchFromGitHub {
       owner = "caelestia-dots";
       repo = "shell";
-      rev = "98eb7c16798c2e481d4b8d90a97e54433466fb2a";
-      hash = "sha256-eTo5rbVwhOHFO8E40tXX5ecrA6EL+ShBeqtw9gd6B7o=";
+      "rev" = "6455f6c719a6e93502433ee4f4f1cda8036c348d";
+      "hash" = "sha256-+uXI5KNBv/ncgdrxZrOHgTK9pA2il9L1C1i9WiDJpeY=";
     };
 
     nativeBuildInputs = with pkgs; [
@@ -58,8 +57,10 @@
     src = pkgs.fetchFromGitHub {
       owner = "caelestia-dots";
       repo = "cli";
-      rev = "2664749c75417b947efdd9ab1b136aaa0ade42b2";
-      hash = "sha256-kHbGBqXZS8M38CtMng2b/88+l1Od9FfRijycHTfDGZ4=";
+      "rev" = "49db0a8258e0ae26d1787d5fb3a930f4534ea1a5";
+      "hash" = "sha256-+E89sdCWgqQuJ7lNWg1iKJqNAM9UEgBQqYa/HcvBoTY=";
+      # rev = "2664749c75417b947efdd9ab1b136aaa0ade42b2";
+      # hash = "sha256-kHbGBqXZS8M38CtMng2b/88+l1Od9FfRijycHTfDGZ4=";
     };
 
     nativeBuildInputs = with pkgs; [
