@@ -3,7 +3,7 @@
   config,
   ...
 }: let
-  inherit (lib.local) getSpecialTag;
+  inherit (lib.local.tags) getSpecial;
   cloud = {
     shou = {
       default = "eu-central-1";
@@ -114,7 +114,7 @@
     (lib.filterAttrs (_: v: builtins.any (x: lib.elem x v) types))
     (lib.mapAttrs (_: v: {
       type = lib.findFirst (x: lib.elem x v) null types;
-      region = getSpecialTag "region" v;
+      region = getSpecial "region" v;
     }))
   ];
 in {

@@ -63,21 +63,23 @@ treefmt-nix.follows = "treefmt-nix";
         }
       );
     lib = inputs.nixpkgs.lib;
-    libLocal =
-      lib
-      // {
-        local = import ./lib/local.nix {
-          inherit lib;
-          flakeRoot = ./.;
+
+    flakeRoot = ./.;
+    extendedLib = lib.extend (self: _: {
+      local = haumea.load {
+        src = ./lib/local;
+        inputs = {
+          lib = self;
+          inherit flakeRoot;
         };
       };
+    });
   in
     inputs.flake-parts.lib.mkFlake {
       inherit inputs;
       specialArgs = {
-        lib = libLocal;
-        inherit inputs;
-        flakeRoot = ./.;
+        lib = extendedLib;
+        inherit inputs flakeRoot;
       };
     } ({...}: {
       systems = ["x86_64-linux"];

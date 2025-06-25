@@ -5,6 +5,10 @@
   ...
 }: let
   nixModules = config.haumea.clan.tags or {};
+  inherit (lib.local.tags) toInventory getAll groups;
+  allTags = getAll config.clan.inventory.machines;
+  toInv = toInventory allTags;
+  inherit (lib.local.keys) fileFromGroup;
 in {
   clan = {
     inventory = {
@@ -35,49 +39,65 @@ in {
                 extraModules =
                   lib.collect (x: lib.isPath x)
                   (lib.filterAttrs (n: _: (n == "required") || n == "default") v);
-                tags = {
-                  "${n}" = {
-                  };
-                };
+                tags =
+                  toInv [n];
               };
             };
           })
-          nixModules);
+          nixModules)
+        // {
+          import-server = {
+            module = {
+              name = "importer";
+              input = "clan-core";
+            };
+            roles.default = {
+              tags = toInv (groups.server);
+              extraModules = with inputs.srvos.nixosModules; [
+                server
+                mixins-telegraf
+              ];
+            };
+          };
+          import-desktop = {
+            module = {
+              name = "importer";
+              input = "clan-core";
+            };
+            roles.default = {
+              tags = toInv (groups.desktop);
+              extraModules = with inputs.srvos.nixosModules; [
+                desktop
+                mixins-systemd-boot
+                mixins-nix-experimental
+              ];
+            };
+          };
+          import-all = {
+            module = {
+              name = "importer";
+              input = "clan-core";
+            };
+            roles.default = {
+              tags.all = {};
+              extraModules = [
+                ../../options.nix
+                {
+                  clan.inventory.machines = config.clan.inventory.machines;
+                }
+              ];
+            };
+          };
+        };
       services = {
         user-password.default = {roles.default.tags = ["kami"];};
         state-version.default = {roles.default.tags = ["all"];};
 
-        importer = {
-          all.roles.default = {
-            tags = ["all"];
-            extraModules = [
-              ../../options.nix
-              {
-                clan.inventory.machines = config.clan.inventory.machines;
-              }
-            ];
-          };
-          type-server.roles.default = {
-            tags = ["type:server"];
-            extraModules = with inputs.srvos.nixosModules; [
-              server
-              mixins-telegraf
-            ];
-          };
-          type-desktop.roles.default = {
-            tags = ["type:desktop"];
-            extraModules = with inputs.srvos.nixosModules; [
-              desktop
-              mixins-systemd-boot
-              mixins-nix-experimental
-            ];
-          };
-        };
         sshd.all.roles.server = {
           tags = ["all"];
           extraModules = [
             {
-              users.users.root.openssh.authorizedKeys.keys = lib.local. fileFromGroup {
+              users.users.root.openssh.authorizedKeys.keys = fileFromGroup {
                 group = "admin";
                 file = "sshkey";
               };
