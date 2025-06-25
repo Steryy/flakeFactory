@@ -3,8 +3,7 @@
   lib,
   ...
 }: let
-  # inherit (lib.local) getSpecialTag;
-  inherit (lib.local) terranix;
+  inherit (lib.local.terranix.cloudGroups) shou;
 in {
   perSystem = {pkgs, ...}: {
     config.terranix = let
@@ -15,13 +14,12 @@ in {
         p.aws
       ]);
     in {
-
       terranixConfigurations.terraform-shou = {
         terraformWrapper.package = package;
-        modules = lib.collect (x: lib.isPath x ) config.haumea.terranix.shou;
+        modules = lib.collect (x: lib.isPath x) config.haumea.terranix.shou;
         extraArgs = {
           localLib = lib.local;
-          inventory = terranix config.clan.inventory "shou";
+          inventory = shou config.clan.inventory;
         };
         terraformWrapper.prefixText = ''
           AWS_ACCESS_KEY_ID="$(clan secrets get aws-access)"
