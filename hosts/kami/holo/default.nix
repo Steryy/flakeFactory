@@ -1,8 +1,20 @@
-let adminUser = "myuri";
+let
+  adminUser = "myuri";
 in {
-  deploy = { inherit adminUser; };
+  deploy = {inherit adminUser;};
 
   importer = {
+    tags = {
+      kami = {
+        services.sddm-stylix.enable = true;
+        services.hyprland.enable = true;
+        services.geoclue.enable = true;
+        programs = {
+          stylix-icons.enable = true;
+          nixos-icons.enable = true;
+        };
+      };
+    };
     inputs = {
       homeImport.enable = true;
       impermanance.enable = true;
@@ -33,7 +45,6 @@ in {
         rollbacks.btrfs.enable = true;
         device = "/dev/mapper/luksMapped";
       };
-
     })
   ];
 }

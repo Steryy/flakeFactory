@@ -10,7 +10,11 @@ let
 
     lib.listToAttrs
   ];
-  nixModules = config.haumea.nixModules;
+  nixModules = config.haumea.nixModules
+    // {
+      tags = config.haumea.clan.tags ;
+    }
+    ;
   homeModules = config.haumea.homeModules;
 
   specialArgs = { inherit flakeRoot inputs homeModules; 
