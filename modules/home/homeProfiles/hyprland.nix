@@ -2,6 +2,7 @@
   lib,
   options,
   osConfig,
+  config,
   ...
 }: {
   config = lib.mkMerge [
@@ -14,6 +15,8 @@
       };
     }
     (lib.optionalAttrs (options ? "stylix") {
+      wayland.windowManager.hyprland.settings.
+        plugin.dynamic-cursors.rotate.length = config.stylix.cursor.size;
       programs.hyprlock.enable = true;
 
       stylix.targets.hyprpaper.enable = lib.mkForce false;
