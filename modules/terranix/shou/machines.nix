@@ -9,11 +9,12 @@
 in {
         resource.aws_instance =
           lib.mapAttrs (n: v: let
+
+      arch = getSpecial "arch" v.tags;
+      region = getSpecial "region" v.tags;
           in {
             ami = "\${data.aws_ami.nixos-${arch}-${region}.id}";
             instance_type = "t2.micro";
-      arch = getSpecial "arch" v.tags;
-      region = getSpecial "region" v.tags;
 
             provider = "aws.${region}";
             key_name = "\${aws_key_pair.default-${region}.key_name}";
