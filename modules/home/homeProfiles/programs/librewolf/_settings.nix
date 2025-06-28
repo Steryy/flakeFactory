@@ -1,6 +1,10 @@
 {
   "extensions.autoDisableScopes" = 0;
   "services.sync.engine.passwords" = false;
+  "widget.use-xdg-desktop-portal.file-picker" = 1;
+  "widget.use-xdg-desktop-portal.mime-handler" = 1;
+  "widget.use-xdg-desktop-portal.location" = 1;
+  "widget.use-xdg-desktop-portal.open-uri" = 1;
   "browser.startup.page" = 3; # Resume previous session on startup
   # "browser.aboutConfig.showWarning" = false; # I sometimes know what I'm doing
   # "browser.ctrlTab.sortByRecentlyUsed" = false; # (default) Who wants that?
