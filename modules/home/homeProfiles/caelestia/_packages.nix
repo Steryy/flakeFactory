@@ -16,8 +16,8 @@
     src = pkgs.fetchFromGitHub {
       owner = "caelestia-dots";
       repo = "shell";
-      "rev" = "6455f6c719a6e93502433ee4f4f1cda8036c348d";
-      "hash" = "sha256-+uXI5KNBv/ncgdrxZrOHgTK9pA2il9L1C1i9WiDJpeY=";
+      "rev" = "9f0c2cbda48e2b33d12a34e7ff7442c83161a88f";
+      "hash" = "sha256-zqxyFSG4EekncxWM6WuEYtdkkgxpx7IjUG3BvOVM27g=";
     };
 
     nativeBuildInputs = with pkgs; [
