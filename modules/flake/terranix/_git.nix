@@ -49,7 +49,7 @@ in {
     default = null;
     type = with lib.types; nullOr gitSubmodule;
   };
-  options.remote_state.git = {
+  options.remote_state.git =lib.mkOption {
     default = {};
     type = with lib.types; attrsOf (gitSubmodule);
   };
@@ -78,6 +78,6 @@ in {
   in
     lib.mkMerge [
       backend
-      # remote
+      remote
     ];
 }
