@@ -19,6 +19,9 @@ in {
       type = lib.types.nullOr lib.types.package;
       default = null;
     };
+    app2unit = lib.mkOption {
+      type = lib.types.package;
+    };
 
     quickshellPackage = lib.mkOption {
       type = lib.types.package;
@@ -74,12 +77,9 @@ in {
       '';
 
     services.caelestia-shell.extraPackages = with pkgs; [
+      cfg.app2unit
       lm_sensors
       fish
-      (writeShellScriptBin "app2unit" ''
-        ${gtk3}/bin/gtk-launch "$@"
-
-      '')
       curl
       cava
       ibm-plex
