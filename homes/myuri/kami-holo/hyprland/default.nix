@@ -25,12 +25,10 @@
     swww
   ];
 
-  plugins = with pkgs.hyprlandPlugins; [
+  wayland.windowManager.hyprland.plugins = with pkgs.hyprlandPlugins; [
     hypr-dynamic-cursors
     hyprsplit
   ];
-  settings = {
-  };
   wayland.windowManager.hyprland.settings = {
     plugin = {
       dynamic-cursors = {
