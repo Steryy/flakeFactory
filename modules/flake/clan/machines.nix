@@ -18,6 +18,7 @@ let
   homeModules = config.haumea.homeModules;
 
   specialArgs = { inherit flakeRoot inputs homeModules; 
+    lib = lib;
     extraInputs = config.partitions.extraInputs.extraInputs; };
   desktop=["kami"];
 in {
