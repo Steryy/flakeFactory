@@ -51,6 +51,14 @@ in {
             modules = [
               ./_git.nix
               {
+                terraform.required_providers = {
+                  local.source = "hashicorp/local";
+                  null.source = "hashicorp/null";
+                  external.source = "hashicorp/external";
+
+                };
+              }
+              {
                 backend.git = {
                   owner = "Steryy";
                   repo = "flakeFactory";

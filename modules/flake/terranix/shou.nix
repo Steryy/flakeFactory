@@ -16,7 +16,16 @@ in {
     in {
       terranixConfigurations.terraform-shou = {
         terraformWrapper.package = package;
-        modules = lib.collect (x: lib.isPath x) config.haumea.terranix.shou;
+        modules =
+          [
+            {
+              terraform.required_providers.aws = {
+                source = "hashicorp/aws";
+                # version = "~> 4.90";
+              };
+            }
+          ]
+          ++ lib.collect (x: lib.isPath x) config.haumea.terranix.shou;
         extraArgs = {
           localLib = lib.local;
           inventory = shou config.clan.inventory;
