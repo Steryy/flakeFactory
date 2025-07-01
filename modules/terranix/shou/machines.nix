@@ -40,4 +40,18 @@ in {
             };
           })
           machines;
+
+        output."instance_ips".value =
+          lib.mapAttrs (
+            n: _: let
+              host = "aws_instance.${n}";
+            in {
+              ipv4 =
+                lib.tf.ref "${host}.public_ip";
+              ipv6 =
+                lib.tf.ref
+                "length(${host}.ipv6_addresses) > 0 ? ${host}.ipv6_addresses[0] :  null";
+            }
+          )
+          machines;
       }
