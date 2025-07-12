@@ -4,16 +4,20 @@ in {
   clan = {
     inventory = {
       instances = {
-        zt = {
+        ts = {
           module = {
-            name = "zerotier";
-            input = "clan-core";
+            name = "@local/tailscale";
           };
-          roles.peer.tags.all = {};
-          roles.moon.machines = {};
-          roles.controller.machines.shou-jeannette = {
-            settings = {
-              allowedIps = [];
+          roles = {
+            client = {
+              tags.all = {};
+            };
+            headscale = {
+              settings = {
+                tld = "ts.stanley-dev.net";
+                listeningDomain = "zt.stanley-dev.net";
+              };
+              machines.shou-jeannette = {};
             };
           };
         };
