@@ -50,10 +50,22 @@ in {
           config = {
             modules = [
               ./_git.nix
+              ({lib, ...}: {
+                terraform = {
+                  encryption = {
+                    remote_state_data_sources = {
+                      default = {
+                        # enforced = true;
+                        method = lib.tfRef "method.aes_gcm.encryption_method";
+                      };
+                    };
+                  };
+                };
+              })
               {
                 terraform.required_providers = {
                   local.source = "hashicorp/local";
-                  null.source = "hashicorp/null";
+                  # null.source = "hashicorp/null";
                   external.source = "hashicorp/external";
 
                 };
