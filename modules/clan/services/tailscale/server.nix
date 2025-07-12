@@ -41,12 +41,12 @@
               };
             };
           logtail.enabled = false;
-          server_url = "${settings.publicUrl}";
+          server_url = "https://${settings.listeningDomain}";
           dns = {
             magic_dns = true;
             base_domain = settings.tld;
             search_domains = [
-              settings.domain
+              settings.listeningDomain
             ];
             nameservers.global = [
               "1.1.1.1"

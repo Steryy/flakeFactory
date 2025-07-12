@@ -56,10 +56,7 @@ with types; {
   };
   roles.headscale = {
     interface = {
-      options.publicUrl = lib.mkOption {
-        type = str;
-      };
-      options.domain = lib.mkOption {
+      options.listeningDomain = lib.mkOption {
         type = str;
         default = "tailscale.localhost";
       };
@@ -81,9 +78,9 @@ with types; {
           headscale = {
             port = 8087;
             nameFunc = {domain, ...}:
-              if domain == settings.domain
+              if domain == settings.listeningDomain
               then domain
-              else domain;
+              else null;
             host = "127.0.0.1";
             additionalCfg = {proxyPass, ...}: {
               locations = {

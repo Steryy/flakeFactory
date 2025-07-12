@@ -35,13 +35,12 @@
         extraUpFlags =
           [
             "--accept-routes"
-            "--login-server=${controller.settings.publicUrl}"
+            "--login-server=https://${controller.settings.listeningDomain}"
           ]
           ++ (lib.optional (settings.advertised-rotes != [])
             "--advertise-routes=${
               lib.concatStringsSep "," settings.advertised-rotes
             }");
-        # map (x: "--advertise-routes=${exposedIps}") settings.advertised-rotes;
       };
       clan.core = {
         state.tailscale.folders = ["/var/lib/tailscale"];
