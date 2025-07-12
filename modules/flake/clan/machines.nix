@@ -79,6 +79,15 @@ in {
       in {
         imports = 
           v.modules  ++ extraModules ++ [{
+
+            options.clan.inventory = {
+              machines = lib.mkOption {
+                type = lib.types.attrs;
+              };
+              tags = lib.mkOption {
+                type = lib.types.listOf lib.types.str;
+              };
+            };
             config = { 
               clan.inventory.tags = tags;
               _module.args.hostName = n;

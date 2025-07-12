@@ -23,28 +23,11 @@ in {
           with colors;
             if polarity == "dark"
             then {
-              # base00 = background;
-              # base01 = surface_container;
-              # base02 = surface_container_highest;
-              # base03 = outline;
-              # base04 = on_surface_variant;
-              # base05 = on_surface;
-              # base06 = secondary_fixed_dim;
-              # base07 = on_primary_container;
-              # base08 = error;
-              # base09 = tertiary;
-              # base0A = secondary;
-              # base0B = primary;
-              # base0C = primary_fixed_dim;
-              # # base0D = surface_variant;
-              # base0D = surface_tint;
-              # base0E = tertiary_fixed_dim;
-              # base0F = error_container;
               base00 = background;
               base01 = surface_container;
               base02 = surface_container_highest;
               base03 = outline;
-              base04 = on_surface_variant;
+              base04 = outline_variant;
               base05 = on_surface;
               base06 = secondary_fixed;
               base07 = on_primary_container;

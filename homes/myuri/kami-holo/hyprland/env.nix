@@ -22,27 +22,7 @@
       "XCURSOR_THEME,${c.cursor.name}"
       "QT_QPA_PLATFORMTHEME,${c.targets.qt.platform}"
     ];
-
-  rgbToHex = rgbColorString: let
-    values =
-      builtins.split ","
-      (builtins.replaceStrings ["rgb(" ")"] ["" ""] rgbColorString);
-    rgb = map (x: builtins.fromJSON x) [
-      (builtins.elemAt values 0)
-      (builtins.elemAt values 2)
-      (builtins.elemAt values 4)
-    ];
-  in
-    lib.strings.concatStringsSep "" (map (x:
-      lib.pipe x [
-        (lib.min 255.0)
-        (lib.max 0.0)
-        builtins.floor
-        lib.toHexString
-        (lib.strings.fixedWidthString 2 "0")
-        toString
-      ])
-    rgb);
+  inherit (lib.local.colors) rgbString2Rgb rgb2Hex mix;
 in {
   config = lib.mkMerge [
     {
@@ -55,17 +35,18 @@ in {
     }
     (
       lib.optionalAttrs (
+        true
         # options.services ? "caelestia-shell"
         # options.service ? "caelestia-shell"
         # &&
-        options ? "stylix"
-        && options.programs ? "matugen"
+        # options ? "stylix"
+        # && options.programs ? "matugen"
       ) {
         home.file.".local/share/caelestia/schemes/stylix/default/dark.txt".text = let
           dark =
             lib.mapAttrs' (n: v: {
               name = lib.toCamelCase n;
-              value = rgbToHex v;
+              value = rgb2Hex (rgbString2Rgb v);
             })
             osConfig.programs.matugen.theme.colors.dark;
           term = config.lib.stylix.colors;
@@ -108,18 +89,33 @@ in {
                 subtext1 = dark."onSurfaceVariant";
                 subtext0 = dark."outline";
                 overlay2 =
-                  dark."surface";
-                # colours["outline"], 0.86);
-                overlay1 = dark."surface";
-                # , colours["outline"], 0.71);
-                overlay0 = dark."surface";
-                #, colours["outline"], 0.57);
-                surface2 = dark."surface";
-                #, colours["outline"], 0.43);
-                surface1 = dark."surface";
-                #, colours["outline"], 0.29);
-                surface0 = dark."surface";
-                #, colours["outline"], 0.14);
+                  mix
+                  dark."surface"
+                  dark."outline"
+                  86;
+                overlay1 =
+                  mix
+                  dark."surface"
+                  dark."outline"
+                  71;
+                overlay0 =
+                  mix
+                  dark."surface"
+                  dark."outline"
+                  57;
+                surface2 =
+                  mix dark."surface"
+                  dark."outline"
+                  43;
+                surface1 =
+                  mix
+                  dark."surface"
+                  dark."outline"
+                  29;
+                surface0 =
+                  mix dark."surface"
+                  dark."outline"
+                  14;
                 base = dark."surface";
                 mantle =
                   # darken(

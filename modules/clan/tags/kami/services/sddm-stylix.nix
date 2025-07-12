@@ -36,21 +36,7 @@ in {
       })
     ];
 
-    # breeze-icons
-    # kirigami
-    # pkgs.kirigami
     package = pkgs.kdePackages.sddm;
-    extraPackages = with pkgs.kdePackages; [
-      # pkgs.qt5.qtbase
-      # pkgs.kdePackages.qtbase
-      # pkgs.qtile-unwrapped
-
-      libplasma
-      plasma5support
-      qtvirtualkeyboard
-      qtsvg
-      qtvirtualkeyboard
-    ];
     theme = "where_is_my_sddm_theme";
   };
 }
