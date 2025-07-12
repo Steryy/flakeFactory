@@ -11,7 +11,7 @@ with types; {
             v.roles.headscale.machines;
         in
           lib.mapAttrsToList (
-            _: v: [v.settings.domain] ++ ["${v.settings.tld}"]
+            _: v: [v.settings.tld]
           )
           machines
       )
