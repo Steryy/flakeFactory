@@ -1,94 +1,75 @@
 {
   lib,
-extraInputs,
+  extraInputs,
   pkgs,
   config,
   options,
   ...
 }: let
-  adjustLightness = primaryScale: rgbColorString:
-    let
-      values = builtins.split ","
-        (builtins.replaceStrings [ "rgb(" ")" ] [ "" "" ] rgbColorString);
-      rgb = map (x: builtins.fromJSON x) [
-        (builtins.elemAt values 0)
-        (builtins.elemAt values 2)
-        (builtins.elemAt values 4)
-      ];
-      adj = lib.pipe rgb [
-        (lib.foldl (acc: next: acc + next) 0)
-        (x: x / 3.0)
-        (lib.max 3.0)
-        (x: (x / 255.0 * (1.0 - primaryScale) + primaryScale) / x * 255.0)
-      ];
-      round = x:
-        let
-          floored = builtins.floor x;
-          diff = x - floored;
-        in if diff >= 0.5 then floored + 1 else floored;
-      adjust = int:
-        lib.pipe int [
-          (x: x * adj)
-          (lib.min 255.0)
-          (lib.max 0.0)
-          round
-          lib.toHexString
-          (lib.strings.fixedWidthString 2 "0")
-          toString
-        ];
-    in lib.strings.concatStringsSep "" (map (x: adjust x) rgb);
+  inherit (lib.local.colors) rgbString2Rgb rgb2Hex lighten;
 in {
   imports = [
     extraInputs.stylix.nixosModules.stylix
   ];
-  options.stylix.primaryScale = {
-    dark = lib.mkOption {
-      type = lib.types.addCheck lib.types.float (x: x >= -1.0 && x <= 1.0);
-      default = 0.0;
-      description = ''
-        Use this option to change the generated dark color scheme's contrast.
-        0 represents standard (i.e. the design as spec'd),
-        and 1 represents maximum contrast.
-      '';
-    };
-    light = lib.mkOption {
-      type = lib.types.addCheck lib.types.float (x: x >= -1.0 && x <= 1.0);
-      default = 0.0;
-      description = ''
-        Use this option to change the generated light color scheme's contrast.
-        0 represents standard (i.e. the design as spec'd),
-        and 1 represents maximum contrast.
-      '';
-    };
-  };
   config = lib.mkMerge [
     (lib.optionalAttrs (options.programs ? "matugen") {
       stylix = {
         base16Scheme = let
-          colors = config.programs.matugen.theme.colors."${config.stylix.polarity}";
-        in
-          lib.mapAttrs (_: v: let
-            adjust = config.stylix.primaryScale.${config.stylix.polarity};
-          in
-            adjustLightness adjust v)
-          {
-            base00 = colors.background;
-            base01 = colors.surface_container;
-            base02 = colors.surface_container_highest;
-            base03 = colors.outline;
-            base04 = colors.on_surface_variant;
-            base05 = colors.on_surface;
-            base06 = colors.secondary_fixed;
-            base07 = colors.on_primary_container;
-            base08 = colors.error;
-            base09 = colors.tertiary;
-            base0A = colors.secondary;
-            base0B = colors.primary;
-            base0C = colors.primary_fixed;
-            base0D = colors.surface_tint;
-            base0E = colors.tertiary_fixed;
-            base0F = colors.on_error_container;
-          };
+          polarity = config.stylix.polarity;
+          colors =
+            lib.mapAttrs (_: v: rgb2Hex (rgbString2Rgb v))
+            config.programs.matugen.theme.colors."${polarity}";
+        in (
+          with colors;
+            if polarity == "dark"
+            then {
+              base00 = background;
+              base01 = surface_container;
+              base02 = surface_container_highest;
+              base03 = outline;
+              base04 = outline_variant;
+              base05 = on_surface;
+              base06 = secondary_fixed;
+              base07 = on_primary_container;
+              base08 = error;
+              base09 = tertiary;
+              base0A = secondary;
+              base0B = primary;
+              base0C = primary_fixed;
+              base0D = surface_tint;
+              base0E = tertiary_fixed;
+              base0F = error_container;
+              # base0F = on_error_container;
+
+              base10 = surface_container_lowest;
+              base11 = scrim;
+              base12 = lighten error 8;
+              base13 = lighten secondary 9;
+              base14 = lighten primary 9;
+              base15 = lighten primary_fixed 9;
+              base16 = lighten surface_tint 9;
+              base17 = lighten tertiary_fixed 9;
+            }
+            else {
+              base00 = background;
+              base01 = surface_container;
+              base02 = surface_container_highest;
+              base03 = outline;
+              base04 = on_surface_variant;
+              base05 = on_surface;
+              base06 = on_secondary_fixed;
+              base07 = on_primary_container;
+              base08 = error;
+              base09 = on_tertiary;
+              base0A = on_secondary_container;
+              base0B = on_secondary_fixed_variant;
+              base0C = on_primary_fixed;
+              base0D = surface_tint;
+              # base0D = surface_variant;
+              base0E = on_tertiary_fixed;
+              base0F = on_error_container;
+            }
+        );
 
         image = config.programs.matugen.wallpaper;
       };
@@ -124,6 +105,7 @@ in {
           package = pkgs.catppuccin-cursors.mochaMauve;
           size = 48;
         };
+        targets.nixos-icons.enable = false;
 
         targets.qt.platform = lib.mkForce "qtct";
         targets.qt.enable = true;

@@ -1,8 +1,22 @@
-{ inputs,  config, ... }: {
-  imports = [ inputs.clan-core.flakeModules.clan ];
+{
+  inputs,
+  config,
+  lib,
+  ...
+}: let
+  modules =
+    lib.mapAttrs' (n: v: {
+      name = "@local/${n}";
+      value = v.default or v;
+    })
+    config.haumea.clan.services;
+in {
+  imports = [inputs.clan-core.flakeModules.clan];
   clan = {
-    inventory = { modules = config.haumea.clan.services or {}; };
-    meta = { name = "Operation-Snowflake"; };
+    inherit modules;
+    inventory = {
+      # inherit modules;
+    };
+    meta = {name = "Operation-Snowflake";};
   };
-
 }

@@ -40,7 +40,7 @@ let
         ];
         importerModules = (eval {
           inherit modules;
-          specialArgs = { inherit flakeRoot extraInputs inputs ; };
+          specialArgs = { inherit flakeRoot extraInputs inputs lib ; };
           inherit (config.clan.inventory) tags;
         });
 

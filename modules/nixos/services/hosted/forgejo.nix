@@ -29,20 +29,4 @@ in {
     settings = { server = { DOMAIN = domain; }; };
     secrets = { };
   };
-  services.nginx = {
-    enable = true;
-    virtualHosts = {
-      "${domain}" = {
-        forceSSL = true;
-        # enableACME = true;
-        locations."/" = {
-          proxyPass = "http://localhost:${
-              builtins.toString
-              config.services.forgejo.settings.server.HTTP_PORT
-            }";
-          proxyWebsockets = true;
-        };
-      };
-    };
-  };
 }

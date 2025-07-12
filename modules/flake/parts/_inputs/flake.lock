@@ -540,6 +540,42 @@
         "type": "github"
       }
     },
+    "nixlib": {
+      "locked": {
+        "lastModified": 1748740939,
+        "narHash": "sha256-rQaysilft1aVMwF14xIdGS3sj1yHlI6oKQNBRTF40cc=",
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "rev": "656a64127e9d791a334452c6b6606d17539476e2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "type": "github"
+      }
+    },
+    "nixos-generators": {
+      "inputs": {
+        "nixlib": "nixlib",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1747663185,
+        "narHash": "sha256-Obh50J+O9jhUM/FgXtI3he/QRNiV9+J53+l+RlKSaAk=",
+        "owner": "nix-community",
+        "repo": "nixos-generators",
+        "rev": "ee07ba0d36c38e9915c55d2ac5a8fb0f05f2afcc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixos-generators",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1748460289,
@@ -709,6 +745,26 @@
         "type": "github"
       }
     },
+    "quickshell": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1750535835,
+        "narHash": "sha256-XnVSY70rW3DsMdftazi0xr0rMGnyclBlG7sSTLwktI4=",
+        "ref": "refs/heads/master",
+        "rev": "20c3da01f1b2bc038582eee831e4f5055b4f71ff",
+        "revCount": 594,
+        "type": "git",
+        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://git.outfoxxed.me/outfoxxed/quickshell"
+      }
+    },
     "root": {
       "inputs": {
         "aagl": "aagl",
@@ -721,8 +777,10 @@
         "lanzaboote": "lanzaboote",
         "matugen": "matugen",
         "nix-topology": "nix-topology",
+        "nixos-generators": "nixos-generators",
         "nixpkgs": "nixpkgs_3",
         "nur": "nur",
+        "quickshell": "quickshell",
         "stylix": "stylix",
         "systems": "systems_3"
       }

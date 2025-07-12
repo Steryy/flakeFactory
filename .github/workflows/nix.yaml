@@ -1,0 +1,16 @@
+name: "Nix flake check"
+on:
+  pull_request:
+  push:
+    branches:
+    - "main"
+    - "feat-*"
+    - "feature/*"
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: wimpysworld/nothing-but-nix@main     
+    - uses: DeterminateSystems/determinate-nix-action@main
+    - run: nix flake check

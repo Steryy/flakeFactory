@@ -1,3 +1,4 @@
+
 { lib, config, ... }:
 {
   options.clan.mycelium-static-hosts = {

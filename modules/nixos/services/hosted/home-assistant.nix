@@ -37,21 +37,5 @@ in {
       };
     };
 
-    services.nginx = {
-      enable = true;
-      virtualHosts = {
-        "${domain}" = {
-          forceSSL = true;
-          # enableACME = true;
-          locations."/" = {
-            proxyPass = "http://localhost:${
-                builtins.toString
-                config.services.home-assistant.config.http.server_port
-              }";
-            proxyWebsockets = true;
-          };
-        };
-      };
-    };
   };
 }

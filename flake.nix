@@ -41,10 +41,17 @@ treefmt-nix.follows = "treefmt-nix";
       repo = "disko";
       type = "github";
     };
+
+    terranix = {
+      url = "github:terranix/terranix";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
   };
 
   outputs = inputs @ {...}: let
-    lib = inputs.nixpkgs.lib;
     haumea = inputs.haumea.lib;
 
     flakeModules =
@@ -55,12 +62,24 @@ treefmt-nix.follows = "treefmt-nix";
           loader = haumea.loaders.path;
         }
       );
+    lib = inputs.nixpkgs.lib;
+
+    flakeRoot = ./.;
+    extendedLib = lib.extend (self: _: {
+      local = haumea.load {
+        src = ./lib/local;
+        inputs = {
+          lib = self;
+          inherit flakeRoot;
+        };
+      };
+    });
   in
     inputs.flake-parts.lib.mkFlake {
       inherit inputs;
       specialArgs = {
-        inherit inputs;
-        flakeRoot = ./.;
+        lib = extendedLib;
+        inherit inputs flakeRoot;
       };
     } ({...}: {
       systems = ["x86_64-linux"];
@@ -98,6 +117,10 @@ treefmt-nix.follows = "treefmt-nix";
           src = ./modules/disko;
         };
         clan = { src = ./modules/clan; };
+        terranix = {
+          src = ./modules/terranix;
+        };
+
       };
       imports =
         flakeModules;

@@ -10,7 +10,8 @@
       gpg.enable = true;
       rofi.enable = true;
       hyprland.enable = true;
-      end-4.enable = true;
+      # end-4.enable = true;
+      caelestia.enable = true;
 
       git.enable = true;
       programs = {
