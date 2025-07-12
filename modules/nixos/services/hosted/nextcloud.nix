@@ -4,7 +4,6 @@ let
   hostname = "nextcloud.${domain}";
 in {
   config = {
-
     clan.core = {
       state.nextcloud.folders = [
         config.services.nextcloud.home
@@ -28,11 +27,13 @@ in {
           fi
           mkpasswd -s -m sha-512 < "$out"/admin-password | tr -d "\n" > "$out"/admin-password-hash
         '';
-
       };
     };
 
-    # networking.exposedServices.nextcloud = { port = 11000; };
+    networking.exposedServices.nextcloud = {
+      port = 11000;
+      host = "127.0.0.1";
+    };
 
     clan.postgresql.users.nextcloud = { };
     clan.postgresql.databases.nextcloud.create.options = {
@@ -66,18 +67,11 @@ in {
       phpOptions = { "opcache.interned_strings_buffer" = "16"; };
       settings = {
         # overwriteprotocol = "https";
-        trusted_proxies = [ "127.0.0.1" ];
+        trusted_proxies = [
+          config.networking.exposedServices.nextcloud.host
+        ];
       };
       extraAppsEnable = true;
-    };
-    services.nginx = {
-      enable = true;
-      virtualHosts = {
-        "${hostname}" = {
-          forceSSL = true;
-          # enableACME = true;
-        };
-      };
     };
   };
 }

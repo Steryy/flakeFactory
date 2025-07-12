@@ -5,9 +5,6 @@ let
     domain = "vaultwarden.${lib.head config.networking.domains}";
   };
 in {
-  # networking.exposedServices.vaultwarden = {
-  #   port = config.vaultwarden.config.ROCKET_PORT;
-  # };
   clan.postgresql.users.vaultwarden = { };
   clan.postgresql.databases.vaultwarden.create.options = {
     TEMPLATE = "template0";
@@ -31,7 +28,6 @@ in {
         pwgen
         libargon2
         openssl
-
       ];
       script = ''
         ADMIN_PWD=$(pwgen 16 -n1 | tr -d "\n")
@@ -43,7 +39,6 @@ in {
         echo -n "$ADMIN_PWD" > "$out"/vaultwarden-admin
         echo -n "$config" > "$out"/vaultwarden-admin-hash
       '';
-
     };
   };
   systemd.services.vaultwarden = {
@@ -66,26 +61,18 @@ in {
       ROCKET_PORT = 8222;
     };
   };
-  services.nginx = {
-    enable = true;
-    virtualHosts = {
-      "${cfg.domain}" = {
-        forceSSL = true;
-        # enableACME = true;
-        locations."/" = {
-          proxyPass = "http://localhost:${builtins.toString cfg.port}";
-          proxyWebsockets = true;
-        };
-        locations."/notifications/hub" = {
-          proxyPass = "http://localhost:${builtins.toString cfg.port}";
-          proxyWebsockets = true;
-        };
-        locations."/notifications/hub/negotiate" = {
-          proxyPass = "http://localhost:${builtins.toString cfg.port}";
-          proxyWebsockets = true;
-        };
+
+  networking.exposedServices.vaultwarden = {
+    port = config.vaultwarden.config.ROCKET_PORT;
+    additionalCfg = {proxyPass, ...}: {
+      locations."/notifications/hub" = {
+        inherit proxyPass;
+        proxyWebsockets = true;
+      };
+      locations."/notifications/hub/negotiate" = {
+        inherit proxyPass;
+        proxyWebsockets = true;
       };
     };
   };
-
 }
