@@ -183,9 +183,9 @@ in {
                 subdir')
               (subDirs v.settings.subDirectories);
             in
-              f {} name subdirs
+              f  name subdirs
           )
-          clients;
+          ;
       in {
         options = {
           clan.services.ssh-share = {
@@ -195,7 +195,7 @@ in {
                 type = lib.types.anything;
                 readOnly = true;
                 default = lib.flatten (
-                  forMachine (_: subdirs: subDirs)
+                  forMachine ( _: toString ) roles.client.machines
                 );
               };
           };
@@ -228,7 +228,7 @@ in {
 
                 cmd = ''command="rsync --config=${cfg} --server --daemon .",no-agent-forwarding,no-port-forwarding,no-user-rc,no-X11-forwarding,no-pty'';
               in "${cmd} ${getSSH name}"
-            );
+            ) clients ;
           };
         };
       };

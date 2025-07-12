@@ -63,7 +63,7 @@ in {
   };
 
   networking.exposedServices.vaultwarden = {
-    port = config.vaultwarden.config.ROCKET_PORT;
+    port = config.services. vaultwarden.config.ROCKET_PORT;
     additionalCfg = {proxyPass, ...}: {
       locations."/notifications/hub" = {
         inherit proxyPass;
