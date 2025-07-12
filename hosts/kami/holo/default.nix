@@ -9,8 +9,8 @@ in {
         services.sddm-stylix.enable = true;
         services.hyprland.enable = true;
         services.geoclue.enable = true;
-        programs = {
-          stylix-icons.enable = true;
+        overlays = {
+          stylix-icon.enable = true;
           nixos-icons.enable = true;
         };
       };

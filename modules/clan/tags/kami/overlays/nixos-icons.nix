@@ -18,7 +18,7 @@ in {
     };
   };
   config. 
-      nixpkgs.overlays = [
+      nixpkgs.overlays = lib.mkBefore [
     (self: super: {
       nixos-icons = super.nixos-icons.overrideAttrs (oldAttrs: {
         src = pkgs.applyPatches {
