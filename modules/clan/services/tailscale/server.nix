@@ -15,12 +15,57 @@
       state.headscale.folders = ["/var/lib/headscale"];
     };
 
+    systemd.services.headscale-auto = {
+      wantedBy = ["multi-user.target"];
+      after = ["headscale.service"];
+
+      script = "${pkgs.writeShellScript "sta" ''
+        PATH="$PATH:${pkgs.headscale}/bin:${pkgs.jq}/bin"
+        sleep 5
+        getId(){
+          user=$1
+          user_id=$(headscale users ls -n "$user" -o json |   jq '.[] | .id ' )
+          if [  -z "$user_id"  ]; then
+            echo "User ID not found, creating user..."
+            headscale users create "$user"
+            user_id=$(headscale users ls -n "$user" -o json |   jq '.[] | .id ' )
+          fi
+          echo "$user_id"
+        }
+
+        baseDir="/var/lib/headscale/preAuth"
+        mkdir -p  "$baseDir"
+        ${lib.concatMapStrings (x:
+          #bash
+          ''
+            mkdir -p "$baseDir/${x}"
+            userId=$(getId "auth_user" )
+            if [ ! -f  "$KEY"  ]; then
+              headscale preauthkeys create --user $userId  --expiration 20d --reusable  -o json | jq -r '.key' > "$baseDir/${x}/pre-auth-key"
+            fi
+
+          '') (lib.attrNames clients)}
+
+      ''}";
+    };
     clan.nginx.acme.email = "contact@stanley-dev.net";
 
     services = {
       headscale = {
         enable = true;
         port = 8087;
+        # package = pkgs.headscale.overrideAttrs (old: rec {
+        #   version = "0.25.0";
+        #
+        #   src = pkgs.fetchFromGitHub {
+        #     owner = "juanfont";
+        #     repo = "headscale";
+        #     rev = "v${version}";
+        #     hash = "sha256-5CwaPaGh0yvHwmSpbsvc4ajkW9RbYVMilNTIJxeYcIs=";
+        #   };
+        #
+        #   vendorHash = "sha256-ZQj2A0GdLhHc7JLW7qgpGBveXXNWg9ueSG47OZQQXEw=";
+        # });
         settings = {
           policy.path = let
             jsonFormat = pkgs.formats.json {};
