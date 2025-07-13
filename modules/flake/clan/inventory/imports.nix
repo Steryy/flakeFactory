@@ -53,6 +53,7 @@ in {
           tags.all = {};
           extraModules = [
             {
+              clan.core.settings.state-version.enable = true;
               clan.inventory.machines = config.clan.inventory.machines;
             }
           ];

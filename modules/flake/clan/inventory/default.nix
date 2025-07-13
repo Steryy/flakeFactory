@@ -4,9 +4,26 @@ in {
   clan = {
     inventory = {
       instances = {
+        sshd = {
+          module.name = "sshd";
+          roles = {
+            server = {
+              tags.all = {};
+              extraModules = [
+                {
+                  users.users.root.openssh.authorizedKeys.keys = fileFromGroup {
+                    group = "admin";
+                    file = "sshkey";
+                  };
+                }
+              ];
+            };
+          };
+        };
         ts = {
           module = {
             name = "@local/tailscale";
+            input = "self";
           };
           roles = {
             client = {
@@ -20,22 +37,6 @@ in {
               machines.shou-jeannette = {};
             };
           };
-        };
-      };
-      services = {
-        user-password.default = {roles.default.tags = ["kami"];};
-        state-version.default = {roles.default.tags = ["all"];};
-
-        sshd.all.roles.server = {
-          tags = ["all"];
-          extraModules = [
-            {
-              users.users.root.openssh.authorizedKeys.keys = fileFromGroup {
-                group = "admin";
-                file = "sshkey";
-              };
-            }
-          ];
         };
       };
     };

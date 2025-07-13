@@ -39,7 +39,6 @@ in {
           pkgs.cnijfilter_4_00
         ];
       };
-      clan.user-password.user = adminUser;
       fileSystems."/persist".neededForBoot = true;
       persistence = {
         rollbacks.btrfs.enable = true;

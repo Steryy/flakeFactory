@@ -1,4 +1,3 @@
-
 {
   description = "A very basic flake";
 
@@ -8,11 +7,12 @@
     flake-utils.url = "github:numtide/flake-utils";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-compat = {
-        "owner"= "edolstra";
-        "repo"= "flake-compat";
-        "type"= "github";
+      "owner" = "edolstra";
+      "repo" = "flake-compat";
+      "type" = "github";
     };
-    nix-topology={url = "github:oddlama/nix-topology";
+    nix-topology = {
+      url = "github:oddlama/nix-topology";
       inputs.flake-utils.follows = "flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -28,17 +28,17 @@
     };
     impermanence.url = "github:nix-community/impermanence";
 
-    nur = { url = "github:nix-community/NUR"; };
+    nur = {url = "github:nix-community/NUR";};
     aagl = {
       # inputs.nixpkgs.follows = "nixpkgs";
       url = "github:ezKEa/aagl-gtk-on-nix";
     };
 
-    matugen={url = "github:InioX/matugen";
+    matugen = {
+      url = "github:InioX/matugen";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         systems.follows = "systems";
-
       };
     };
 
@@ -53,12 +53,16 @@
     };
     stylix = {
       inputs = {
-        home-manager.follows = "home-manager";
         nixpkgs.follows = "nixpkgs";
         nur.follows = "nur";
-        flake-utils.follows = "flake-utils";
-        flake-compat.follows = "flake-compat";
         systems.follows = "systems";
+        # gnome-shell.follows = "";
+        base16-fish.follows = "";
+        tinted-foot.follows = "";
+        tinted-kitty.follows = "";
+        tinted-schemes.follows = "";
+        tinted-tmux.follows = "";
+        tinted-zed.follows = "";
         # systems.follows = "systems";
       };
       owner = "danth";
@@ -73,5 +77,5 @@
     };
   };
 
-  outputs = _:{};
+  outputs = _: {};
 }

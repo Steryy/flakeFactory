@@ -154,9 +154,34 @@ in {
     perInstance = {
       roles,
       settings,
-      instanceName,
       ...
-    }: {
+    }: let
+      forMachine = f:
+        lib.mapAttrsToList (
+          name: v: let
+            subdirs = map (subdir: let
+              subdir' = mkSubDir (settings
+                // {
+                  inherit subdir name;
+                });
+            in
+              subdir')
+            (subDirs v.settings.subDirectories);
+          in
+            f name subdirs
+        );
+    in {
+      exports = {
+        type = "ssh-share";
+        settings = {
+          inherit (settings) srcDirectory;
+        };
+        specialExports = {
+          subDirs = lib.flatten (
+            forMachine (_: toString) roles.client.machines
+          );
+        };
+      };
       nixosModule = {
         config,
         hostName,
@@ -183,52 +208,40 @@ in {
                 subdir')
               (subDirs v.settings.subDirectories);
             in
-              f  name subdirs
-          )
-          ;
+              f name subdirs
+          );
       in {
-        options = {
-          clan.services.ssh-share = {
-            "${instanceName}".subdirs =
-              lib.mkOption
-              {
-                type = lib.types.anything;
-                readOnly = true;
-                default = lib.flatten (
-                  forMachine ( _: toString ) roles.client.machines
-                );
-              };
-          };
-        };
         config = {
           services.openssh.sftpServerExecutable = "internal-sftp";
 
           users.users."${settings.user}" = {
             shell = "${pkgs.bash}/bin/bash";
 
-            openssh.authorizedKeys.keys = forMachine (
-              name: subdirs
-              : let
-                cfg = pkgs.writeText "rsyncd.conf" ''
-                  log file = /var/log/rsync/${name}/rsync.log
-                  ${
-                    mapSep (subdir: ''
-                      [${toMod subdir}]
-                        use chroot = false
-                        path = ${joinPath settings.srcDirectory subdir}
-                        read only = ${
-                        if settings.writeMode
-                        then "false"
-                        else "true"
-                      }
-                    '')
-                    subdirs
-                  }
-                '';
+            openssh.authorizedKeys.keys =
+              forMachine (
+                name: subdirs
+                : let
+                  cfg = pkgs.writeText "rsyncd.conf" ''
+                    log file = /var/log/rsync/${name}/rsync.log
+                    ${
+                      mapSep (subdir: ''
+                        [${toMod subdir}]
+                          use chroot = false
+                          path = ${joinPath settings.srcDirectory subdir}
+                          read only = ${
+                          if settings.writeMode
+                          then "false"
+                          else "true"
+                        }
+                      '')
+                      subdirs
+                    }
+                  '';
 
-                cmd = ''command="rsync --config=${cfg} --server --daemon .",no-agent-forwarding,no-port-forwarding,no-user-rc,no-X11-forwarding,no-pty'';
-              in "${cmd} ${getSSH name}"
-            ) clients ;
+                  cmd = ''command="rsync --config=${cfg} --server --daemon .",no-agent-forwarding,no-port-forwarding,no-user-rc,no-X11-forwarding,no-pty'';
+                in "${cmd} ${getSSH name}"
+              )
+              clients;
           };
         };
       };

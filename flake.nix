@@ -26,8 +26,6 @@ treefmt-nix.follows = "treefmt-nix";
     sops-nix.follows = "clan-core/sops-nix";
 
     nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
-    home-manager.url = "github:nix-community/home-manager";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     haumea = {
       inputs = { nixpkgs = { follows = "nixpkgs"; }; };
@@ -49,6 +47,7 @@ treefmt-nix.follows = "treefmt-nix";
         nixpkgs.follows = "nixpkgs";
       };
     };
+   pkgs-by-name-for-flake-parts.url = "github:drupol/pkgs-by-name-for-flake-parts";
   };
 
   outputs = inputs @ {...}: let
@@ -122,7 +121,13 @@ treefmt-nix.follows = "treefmt-nix";
         };
 
       };
-      imports =
-        flakeModules;
-    });
+    imports = flakeModules ++ [
+      inputs.pkgs-by-name-for-flake-parts.flakeModule
+    ];
+
+    perSystem = {  ... }: {
+      # (3) point to your directory containing Nix packages
+      pkgsDirectory = ./packages;
+    };
+  });
 }

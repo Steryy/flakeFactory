@@ -22,7 +22,7 @@ let
     extraInputs = config.partitions.extraInputs.extraInputs; };
   desktop=["kami"];
 in {
-  options.clan.hosts = lib.mkOption {
+  options.defaultTags= lib.mkOption {
     type = lib.types.attrs ;
     default = lib.mapAttrs (_: v: v.tags) le ;
 
@@ -34,7 +34,6 @@ in {
     inherit specialArgs;
     machines = lib.mapAttrs (n: v:
       let tags = config.clan.inventory.machines.${n}.tags or [ ];
-          user = v.deploy.adminUser or "user";
 
           impr = enable:
             lib.pipe v.importer [
@@ -91,12 +90,22 @@ in {
             config = { 
               clan.inventory.tags = tags;
               _module.args.hostName = n;
-              users.defaultUser = user;
+              # users.defaultUser = user;
             };
           }] ;
       }) le;
 
     inventory = {
+        instances.users = {
+          module.name = "users";
+          roles.default.machines = lib.mapAttrs (n: v: {
+            settings.user = v.deploy.adminUser or "user";
+            settings.prompt = lib.elem "kami" v.tags;
+
+          }) 
+            le
+          ;
+        };
 
       machines = lib.mapAttrs (n: v: let
         user = v.deploy.adminUser or "user";

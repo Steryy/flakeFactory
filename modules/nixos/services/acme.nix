@@ -1,7 +1,11 @@
-{ config, lib,  ... }:
-let
+{
+  config,
+  lib,
+  exports,
+  ...
+}: let
   provider = config.clan.core.vars.generators.acme.files.provider.value;
-  dnsResorvers = { cloudflare = "1.1.1.1:53"; };
+  dnsResorvers = {cloudflare = "1.1.1.1:53";};
 in {
   config = {
     users.groups.acme.members = [config.services.nginx.user];
@@ -18,9 +22,12 @@ in {
           if dnsResorvers ? "${provider}"
           then dnsResorvers."${provider}"
           else throw "${provider} not supported";
-
       };
-      certs = lib.pipe config.clan.services.ssh-share.acme.subdirs [
+      certs = lib.pipe exports.instances [
+        (lib.filterAttrs (_: v: v.type == "ssh-share" && v.settings ? "srcDirectory" && v.settings.srcDirectory == "/var/lib/acme"))
+        (lib.attrValues)
+        (map (x: x.specialExports.subDirs))
+        lib.flatten
         (map (u: {
           name = u;
           value = {

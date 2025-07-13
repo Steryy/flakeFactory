@@ -21,7 +21,7 @@
         number = lib.length getArchs;
       }
     )
-    config.clan.hosts;
+    config.defaultTags;
 in {
   clan.inventory.machines =
     lib.mapAttrs (_: v: {

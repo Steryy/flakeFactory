@@ -11,6 +11,7 @@ in {
     acme = {
       module = {
         name = "@local/ssh-share";
+        input = "self";
       };
       roles = {
         client = {
@@ -50,6 +51,7 @@ in {
     tailscale = {
       module = {
         name = "@local/ssh-share";
+        input = "self";
       };
       roles = {
         client = {
