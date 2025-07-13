@@ -1,8 +1,8 @@
 diff --git a/modules/dashboard/dash/Resources.qml b/modules/dashboard/dash/Resources.qml
-index 9a1f07a..32e5673 100644
+index a27cce5..4864f77 100644
 --- a/modules/dashboard/dash/Resources.qml
 +++ b/modules/dashboard/dash/Resources.qml
-@@ -26,7 +26,7 @@ Row {
+@@ -29,7 +29,7 @@ Row {
      }
  
      Resource {

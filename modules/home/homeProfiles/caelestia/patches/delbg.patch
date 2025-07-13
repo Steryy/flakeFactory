@@ -1,6 +1,9 @@
+diff --git a/shell.qml b/shell.qml
+index b5c2c9d..63e654e 100644
 --- a/shell.qml
 +++ b/shell.qml
-@@ -1,10 +1,8 @@
+@@ -3,13 +3,11 @@
+ 
  import "modules"
  import "modules/drawers"
 -import "modules/background"
@@ -13,5 +16,3 @@
      Drawers {}
      AreaPicker {}
      Lock {}
- 
-     Shortcuts {}
