@@ -16,13 +16,13 @@
       "QT_WAYLAND_DISABLE_WINDOWDECORATION,1"
     ]
     ++ lib.optionals (options ? "stylix") [
-      "HYPRCURSOR_THEME, ${c.cursor.name}"
-      "HYPRCURSOR_SIZE, ${toString c.cursor. size}"
+      "HYPRCURSOR_THEME,${c.cursor.name}"
+      "HYPRCURSOR_SIZE,${toString c.cursor. size}"
       "XCURSOR_SIZE,${toString c.cursor.size}"
       "XCURSOR_THEME,${c.cursor.name}"
       "QT_QPA_PLATFORMTHEME,${c.targets.qt.platform}"
     ];
-  inherit (lib.local.colors) rgbString2Rgb rgb2Hex mix;
+  inherit (lib.local.colors) rgb hex rgbString2Rgb;
 in {
   config = lib.mkMerge [
     {
@@ -46,10 +46,11 @@ in {
           dark =
             lib.mapAttrs' (n: v: {
               name = lib.toCamelCase n;
-              value = rgb2Hex (rgbString2Rgb v);
+              value = rgb.toHex (rgbString2Rgb v);
             })
             osConfig.programs.matugen.theme.colors.dark;
           term = config.lib.stylix.colors;
+          mix = hex.mix;
         in ''
           rosewater f5e0dc
           flamingo f2cdcd

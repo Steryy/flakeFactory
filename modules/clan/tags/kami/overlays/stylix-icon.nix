@@ -5,17 +5,31 @@
   config,
   ...
 }: let
+  inherit (lib.local.colors) hex hsl;
+
   forCol = file: attrs:
     lib.concatStringsSep "\n"
     (
       lib.flatten (
         lib.mapAttrsToList (
-          n:
-            map (x:
-              ''
-                substituteInPlace ${file} \
-                --replace-fail '${x}' '#${n}'
-              '')
+          n: v: let
+            first = hex.toHsl (hex.removeHash (lib.head v));
+            diffs =
+              map (
+                x: let
+                  c = hex.toHsl (hex.removeHash x);
+                in
+                  hsl.toHex (
+                    hsl.addDiff (hex.toHsl n) (hsl.diff first c)
+                  )
+              )
+              v;
+          in
+            lib.imap0 (i: x: ''
+              substituteInPlace ${file} \
+              --replace-fail '${x}' '#${lib.elemAt diffs i}'
+            '')
+            v
         )
         attrs
       )
@@ -39,8 +53,6 @@ in {
                       "#7eb1dd"
                       "#7ebae4"
                       "#699ad7"
-
-
                       "#6478fa"
                       "#719efa"
                     ];

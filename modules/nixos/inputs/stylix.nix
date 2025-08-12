@@ -6,7 +6,12 @@
   options,
   ...
 }: let
-  inherit (lib.local.colors) rgbString2Rgb rgb2Hex lighten;
+  inherit
+    (lib.local.colors)
+    rgb
+    hex
+    rgbString2Rgb
+    ;
 in {
   imports = [
     extraInputs.stylix.nixosModules.stylix
@@ -17,7 +22,7 @@ in {
         base16Scheme = let
           polarity = config.stylix.polarity;
           colors =
-            lib.mapAttrs (_: v: rgb2Hex (rgbString2Rgb v))
+            lib.mapAttrs (_: v: rgb.toHex (rgbString2Rgb v))
             config.programs.matugen.theme.colors."${polarity}";
         in (
           with colors;
@@ -43,12 +48,12 @@ in {
 
               base10 = surface_container_lowest;
               base11 = scrim;
-              base12 = lighten error 8;
-              base13 = lighten secondary 9;
-              base14 = lighten primary 9;
-              base15 = lighten primary_fixed 9;
-              base16 = lighten surface_tint 9;
-              base17 = lighten tertiary_fixed 9;
+              base12 = hex.lighten error 8;
+              base13 = hex.lighten secondary 9;
+              base14 = hex.lighten primary 9;
+              base15 = hex.lighten primary_fixed 9;
+              base16 = hex.lighten surface_tint 9;
+              base17 = hex.lighten tertiary_fixed 9;
             }
             else {
               base00 = background;
