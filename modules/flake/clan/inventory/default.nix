@@ -1,7 +1,7 @@
 {lib, ...}: let
   inherit (lib.local.keys) fileFromGroup;
 in {
-  clan = {
+ flake. clan = {
     inventory = {
       instances = {
         sshd = {

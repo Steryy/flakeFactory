@@ -5,10 +5,10 @@
 }: let
   clanM = config.haumea.clan;
   inherit (lib.local.tags) toInventory getAll groups;
-  allTags = getAll config.clan.inventory.machines;
+  allTags = getAll config.flake.clan.inventory.machines;
   toInv = toInventory allTags;
 in {
-  clan.inventory.instances =
+ flake. clan.inventory.instances =
     (lib.mapAttrs' (n: v: {
         name = "import-tag-${n}";
         value = {
@@ -54,7 +54,7 @@ in {
           extraModules = [
             {
               clan.core.settings.state-version.enable = true;
-              clan.inventory.machines = config.clan.inventory.machines;
+              clan.inventory.machines = config.flake.clan.inventory.machines;
             }
           ];
         };

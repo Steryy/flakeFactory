@@ -23,14 +23,14 @@
     )
     config.defaultTags;
 in {
-  clan.inventory.machines =
+  flake.clan.inventory.machines =
     lib.mapAttrs (_: v: {
       tags = v.tags;
     })
     arch;
-  clan.machines =
+  flake.clan.machines =
     lib.mapAttrs (n: v: let
-      machineClass = config.clan.inventory.machines."${n}".machineClass;
+      machineClass = config.flake.clan.inventory.machines."${n}".machineClass;
       os =
         {
           nixos = "linux";

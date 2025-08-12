@@ -12,7 +12,7 @@
     config.haumea.clan.services;
 in {
   imports = [inputs.clan-core.flakeModules.clan];
-  clan = {
+  flake.clan = {
     exportsModule = {
       options = {
         type = lib.mkOption {
@@ -38,7 +38,7 @@ in {
       # inherit modules;
     };
     specialArgs = {
-      exports = config.clan.exports;
+      exports = config.flake.clan.exports;
     };
     meta = {name = "Operation-Snowflake";};
   };

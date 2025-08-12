@@ -4,10 +4,10 @@
   ...
 }: let
   inherit (lib.local.tags) toInventory getAll groups;
-  allTags = getAll config.clan.inventory.machines;
+  allTags = getAll config.flake.clan.inventory.machines;
   toInv = toInventory allTags;
 in {
-  clan.inventory.instances = {
+ flake.clan.inventory.instances = {
     acme = {
       module = {
         name = "@local/ssh-share";

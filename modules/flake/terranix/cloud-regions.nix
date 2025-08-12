@@ -10,7 +10,7 @@
     seirei = "germanywestcentral";
   };
 
-  cloudMachines = lib.pipe config.clan.hosts [
+  cloudMachines = lib.pipe config.defaultTags [
     (lib.filterAttrs (_: v: builtins.any (x: lib.elem x v) groups.cloudProviders))
     (lib.mapAttrs (_: v: {
       type = lib.findFirst (x: lib.elem x v) null groups.cloudProviders;
@@ -19,7 +19,7 @@
   ];
 in {
   config = {
-    clan.inventory.machines =
+    flake.clan.inventory.machines =
       lib.mapAttrs (n: v: let
         def = defaultRegions."${v.type}";
       in {

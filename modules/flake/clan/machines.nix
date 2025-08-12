@@ -30,10 +30,10 @@ in {
   config = {
 
   
-  clan = {
+  flake.clan = {
     inherit specialArgs;
     machines = lib.mapAttrs (n: v:
-      let tags = config.clan.inventory.machines.${n}.tags or [ ];
+      let tags = config.flake.clan.inventory.machines.${n}.tags or [ ];
 
           impr = enable:
             lib.pipe v.importer [

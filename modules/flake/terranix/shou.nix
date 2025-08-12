@@ -28,7 +28,7 @@ in {
           ++ lib.collect (x: lib.isPath x) config.haumea.terranix.shou;
         extraArgs = {
           localLib = lib.local;
-          inventory = shou config.clan.inventory;
+          inventory = shou config.flake.clan.inventory;
         };
         terraformWrapper.prefixText = ''
           AWS_ACCESS_KEY_ID="$(clan secrets get aws-access)"
