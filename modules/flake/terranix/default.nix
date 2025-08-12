@@ -1,9 +1,9 @@
 {
   lib,
   inputs,
+  config,
   ...
-}: let
-in {
+}: {
   imports = [
     inputs.terranix.flakeModule
   ];
@@ -50,24 +50,11 @@ in {
           config = {
             modules = [
               ./_git.nix
-              ({lib, ...}: {
-                terraform = {
-                  encryption = {
-                    remote_state_data_sources = {
-                      default = {
-                        # enforced = true;
-                        method = lib.tfRef "method.aes_gcm.encryption_method";
-                      };
-                    };
-                  };
-                };
-              })
               {
                 terraform.required_providers = {
                   local.source = "hashicorp/local";
                   # null.source = "hashicorp/null";
                   external.source = "hashicorp/external";
-
                 };
               }
               {
@@ -79,32 +66,18 @@ in {
               }
             ];
             workdir = "vars/terraform/${name'}";
-            terraformWrapper.extraRuntimeInputs = [inputs'.clan-core.packages.default];
+            terraformWrapper.extraRuntimeInputs = [
+              inputs'.clan-core.packages.default
+              pkgs.nixos-facter
+            ];
             terraformWrapper. suffixText = ''
               ${pkgs.terraform-backend-git}/bin/terraform-backend-git stop
             '';
             terraformWrapper.prefixText = ''
+              TF_BACKEND_HTTP_ENCRYPTION_PASSPHRASE="$(clan secrets get tf-passphrase)"
+              export TF_BACKEND_HTTP_ENCRYPTION_PASSPHRASE
               ${pkgs.terraform-backend-git}/bin/terraform-backend-git &
 
-              TF_VAR_passphrase="$(clan secrets get tf-passphrase)"
-              export TF_VAR_passphrase
-
-              TF_ENCRYPTION=$(cat <<EOF
-              key_provider "pbkdf2" "state_encryption_password" {
-                passphrase = "$TF_VAR_passphrase"
-              }
-              method "aes_gcm" "encryption_method" {
-                keys = "\''${key_provider.pbkdf2.state_encryption_password}"
-              }
-              state {
-                enforced = true
-                method = "\''${method.aes_gcm.encryption_method}"
-              }
-              EOF
-              )
-
-              # shellcheck disable=SC2090
-              export TF_ENCRYPTION
             '';
           };
         }));
