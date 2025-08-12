@@ -48,6 +48,7 @@ treefmt-nix.follows = "treefmt-nix";
       };
     };
    pkgs-by-name-for-flake-parts.url = "github:drupol/pkgs-by-name-for-flake-parts";
+    caelestia-shell.url = "github:caelestia-dots/shell";
   };
 
   outputs = inputs @ {...}: let
