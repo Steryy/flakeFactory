@@ -6,7 +6,7 @@
 }: let
   pkg = config.programs.gpg.package;
 
-  passp = "${pkg}/bin/libexec/gpg-preset-passphrase";
+  passp = "${pkg}/bin/gpg-preset-passphrase";
   script = pkgs.writeShellScript "unlockMeDAddy.sh" ''
     source "${config.services.gpgUnlock.envfile}"
 
