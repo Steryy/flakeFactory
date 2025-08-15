@@ -20,7 +20,7 @@ in {
     };
   };
 
-  config = {
+  config = lib.mkIf cfg.enable {
     xdg.userDirs.extraConfig = {
       CAELESTIA_DATA = ".local/share/caelestia";
       CAELESTIA_STATE = ".local/state/caelestia";

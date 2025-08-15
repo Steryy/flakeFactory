@@ -1,11 +1,14 @@
-{ extraInputs, config, lib, flakeRoot, homeModules, options, inputs, ... }:
-let
+{
+  extraInputs,
+  config,
+  lib,
+  flakeRoot,
+  options,
+  inputs,
+  ...
+}: let
   hn = config.networking.hostName;
   dir = flakeRoot + "/homes";
-
-  eval = x:
-    (import (flakeRoot + "/lib/importer.nix") { inherit lib; }).eval
-    (x // { importerModules = homeModules; });
 
   users = lib.pipe dir [
     builtins.readDir
@@ -14,48 +17,51 @@ let
     (lib.mapAttrs (_: builtins.readDir))
     (lib.mapAttrs (_: lib.filterAttrs (_: v: v == "directory")))
     (lib.mapAttrs (user:
-      lib.filterAttrs (n: _:
-        let hos = lib.removeSuffix ".nix" n;
-        in hos == hn && lib.pathExists "${dir}/${user}/${hn}/default.nix")))
-    (lib.filterAttrs (_: v: v != { }))
-    (lib.mapAttrs (n: _:
-      let
-        modules = [
-          (lib.optionalAttrs (options ? "stylix"){
-            importer.inputs.stylix.enable = lib.mkForce  false;
-          })
-          {
-            importer.inputs.impermanance.enable = (options ? "persistence");
-            imports = [
+      lib.filterAttrs (n: _: let
+        hos = lib.removeSuffix ".nix" n;
+      in
+        hos == hn && lib.pathExists "${dir}/${user}/${hn}/default.nix")))
+    (lib.filterAttrs (_: v: v != {}))
+    (lib.mapAttrs (n: _: let
+      direc = "${dir}/${n}/${hn}";
+    in {
+      imports =
+        [
+          "${direc}/default.nix"
+        ]
+        ++ lib.optional (lib.pathExists "${direc}/importer.nix") (
+          lib.local.importer.import {
+            type = "home";
+            importer = (import "${direc}/importer.nix").importer;
+            includeDef = true;
+            forced = [
               {
-                home = lib.mkDefault {
-                  username = n;
-                  homeDirectory = "/home/${n}";
-                  stateVersion = "25.05";
-                };
+                path = ["inputs" "impermanance" "enable"];
+                update = _: (options ? "persistence");
               }
-              "${dir}/${n}/${hn}/default.nix"
+              {
+                path = ["inputs" "stylix" "enable"];
+                update = old:
+                  if old
+                  then !(options ? "stylix")
+                  else old;
+              }
             ];
+            tags = config.clan.inventory.tags ++ ["inputs" "homeProfiles"];
           }
-        ];
-        importerModules = (eval {
-          inherit modules;
-          specialArgs = { inherit flakeRoot extraInputs inputs lib ; };
-          inherit (config.clan.inventory) tags;
-        });
-
-      in { imports = modules ++ importerModules.modules; }))
+        );
+    }))
   ];
 in {
-  imports = [ extraInputs.home-manager.nixosModules.home-manager ];
+  imports = [extraInputs.home-manager.nixosModules.home-manager];
   config = {
     home-manager = {
       useGlobalPkgs = true;
       backupFileExtension = "backupe";
-      sharedModules =
-        [{ nix.settings.experimental-features = [ "nix-command" "flakes" ]; }];
-      extraSpecialArgs = { inherit flakeRoot extraInputs inputs ;  }; 
+      sharedModules = [{nix.settings.experimental-features = ["nix-command" "flakes"];}];
+      extraSpecialArgs = {inherit flakeRoot extraInputs inputs;};
       inherit users;
+      # inherit users;
     };
   };
 }
