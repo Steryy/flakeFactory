@@ -48,7 +48,6 @@
 
       ''}";
     };
-    clan.nginx.acme.email = "contact@stanley-dev.net";
 
     services = {
       headscale = {

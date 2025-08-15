@@ -5,15 +5,15 @@ let
     domain = "vaultwarden.${lib.head config.networking.domains}";
   };
 in {
-  clan.postgresql.users.vaultwarden = { };
-  clan.postgresql.databases.vaultwarden.create.options = {
+  clan.core.postgresql.users.vaultwarden = { };
+  clan.core.postgresql.databases.vaultwarden.create.options = {
     TEMPLATE = "template0";
     LC_COLLATE = "C";
     LC_CTYPE = "C";
     ENCODING = "UTF8";
     OWNER = "vaultwarden";
   };
-  clan.postgresql.databases.vaultwarden.restore.stopOnRestore =
+  clan.core.postgresql.databases.vaultwarden.restore.stopOnRestore =
     [ "vaultwarden" ];
 
   clan.core = {

@@ -12,15 +12,15 @@ in {
       port = config.services.home-assistant.config.http.server_port;
     };
 
-    clan.postgresql.users.hass = { };
-    clan.postgresql.databases.hass.create.options = {
+    clan.core.postgresql.users.hass = { };
+    clan.core.postgresql.databases.hass.create.options = {
       TEMPLATE = "template0";
       LC_COLLATE = "C";
       LC_CTYPE = "C";
       ENCODING = "UTF8";
       OWNER = "hass";
     };
-    clan.postgresql.databases.hass.restore.stopOnRestore = [ "home-assistant" ];
+    clan.core.postgresql.databases.hass.restore.stopOnRestore = [ "home-assistant" ];
     services.home-assistant = {
       enable = true;
       openFirewall = true;

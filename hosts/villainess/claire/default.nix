@@ -17,12 +17,10 @@ in {
     ({ inputs, pkgs, config, flakeRoot, ... }: {
       imports = [ 
         (flakeRoot + "/modules/disko/ext4.nix") 
-         inputs.clan-core.clanModules.nginx 
-         inputs.clan-core.clanModules.postgresql 
       ];
+      clan.core.postgresql.enable = true;
       nixpkgs.hostPlatform = "x86_64-linux";
       nixpkgs.config = {
-        allowBroken = true;
         allowUnfree = true;
       };
       boot.loader.grub.device = config.disko.devices.disk.main.device;
@@ -30,7 +28,6 @@ in {
         "/dev/disk/by-id/ata-SAMSUNG_SSD_PM871b_M.2_2280_128GB_S3U2NE0M643392";
       networking.domains = [ "home.stanley-dev.net" ];
 
-      clan.nginx.acme.email = "contact@stanley-dev.net";
       services.nextcloud = {
 
         extraApps = {

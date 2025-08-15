@@ -1,5 +1,5 @@
 { config,  lib, ... }:
-let userNames = lib.attrNames config.clan.postgresql.users;
+let userNames = lib.attrNames config.clan.core.postgresql.users;
 in {
 
   services.postgresql = {

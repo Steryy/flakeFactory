@@ -5,10 +5,6 @@
   hostName,
   ...
 }: {
-  imports = [
-    inputs.clan-core.clanModules.nginx
-  ];
-
   config = {
     services.nginx.enable = true;
     services.nginx.virtualHosts =

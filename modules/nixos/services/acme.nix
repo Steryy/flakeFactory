@@ -61,6 +61,6 @@ in {
         '';
       };
     };
-    clan.nginx.acme.email = "contact@stanley-dev.net";
+    security.acme.email = "contact@stanley-dev.net";
   };
 }

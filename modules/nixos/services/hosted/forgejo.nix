@@ -8,8 +8,8 @@ in {
     port = config.services.forgejo.settings.server.HTTP_PORT;
   };
 
-  clan.postgresql.users.forgejo = { };
-  clan.postgresql.databases.forgejo.create.options = {
+  clan.core.postgresql.users.forgejo = { };
+  clan.core.postgresql.databases.forgejo.create.options = {
     TEMPLATE = "template0";
     LC_COLLATE = "C";
     LC_CTYPE = "C";
@@ -17,7 +17,7 @@ in {
     OWNER = "forgejo";
   };
 
-  clan.postgresql.databases.forgejo.restore.stopOnRestore = [ "forgejo" ];
+  clan.core.postgresql.databases.forgejo.restore.stopOnRestore = [ "forgejo" ];
   clan.core.state.forgejo.folders = [ config.services.forgejo.stateDir ];
   services.forgejo = {
     database = {

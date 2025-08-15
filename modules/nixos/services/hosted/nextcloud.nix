@@ -35,15 +35,15 @@ in {
       host = "127.0.0.1";
     };
 
-    clan.postgresql.users.nextcloud = { };
-    clan.postgresql.databases.nextcloud.create.options = {
+    clan.core.postgresql.users.nextcloud = { };
+    clan.core.postgresql.databases.nextcloud.create.options = {
       TEMPLATE = "template0";
       LC_COLLATE = "C";
       LC_CTYPE = "C";
       ENCODING = "UTF8";
       OWNER = "nextcloud";
     };
-    clan.postgresql.databases.nextcloud.restore.stopOnRestore = [ "nextcloud" ];
+    clan.core.postgresql.databases.nextcloud.restore.stopOnRestore = [ "nextcloud" ];
 
     services.nextcloud = {
       enable = true;
