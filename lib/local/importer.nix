@@ -121,11 +121,16 @@ in {
               enable = x.enable;
             }
           ))
-          (map (x: {
-            path =
+          (map (x: let
+            v =
               lib.getAttrFromPath
               x.path
               module;
+          in {
+            path =
+              if lib.isAttrs v
+              then v.default
+              else v;
             type =
               if x.enable
               then "imports"
