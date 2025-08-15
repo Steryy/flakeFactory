@@ -63,56 +63,56 @@ in {
     in {
       terranixConfigurations.terraform-cloudflaire = {
         terraformWrapper.package = package;
-        modules = [
-          ({lib, ...}: {
-            resource.cloudflare_dns_record =
-              (lib.mapAttrs' (name: v: {
-                  name = "${name}-${v.hostname}";
-                  value = {
-                    name = "${name}.${v.centername}.${domain}";
-                    type = lib.tfRef ''${v.ipv6} == null ? "A" : "AAAA"'';
-                    content = lib.tfRef "${v.ipv6} == null ? ${v.ipv4} : ${v.ipv6}";
-                    ttl = 1;
-                    zone_id = lib.tfRef "data.cloudflare_zones.domain.result[0].id";
-                  };
-                })
-                exposed)
-              // {
-                main-zerotier = let
-                  v = "data.terraform_remote_state.${zt.type}.outputs.instance_ips.${zt.key}";
-                in {
-                  name = "zt.${domain}";
-                  type = lib.tfRef ''${v}.ipv6 == null ? "A" : "AAAA"'';
-                  content = lib.tfRef "${v}.ipv6 == null ? ${v}.ipv4 : ${v}.ipv6";
-                  ttl = 1;
-                  zone_id = lib.tfRef "data.cloudflare_zones.domain.result[0].id";
-                };
-              };
-          })
-
-          {
-            terraform.required_providers.cloudflare = {
-              source = "cloudflare/cloudflare";
-            };
-          }
-
-          {
-            provider = {
-              cloudflare = {
-              };
-            };
-            data = {
-              cloudflare_zones."domain" = {
-                name = domain;
-              };
-            };
-            remote_state.git.shou = {
-              owner = "Steryy";
-              repo = "flakeFactory";
-              path = "shou.state.json";
-            };
-          }
-        ];
+        # modules = [
+        #   ({lib, ...}: {
+        #     resource.cloudflare_dns_record =
+        #       (lib.mapAttrs' (name: v: {
+        #           name = "${name}-${v.hostname}";
+        #           value = {
+        #             name = "${name}.${v.centername}.${domain}";
+        #             type = lib.tfRef ''${v.ipv6} == null ? "A" : "AAAA"'';
+        #             content = lib.tfRef "${v.ipv6} == null ? ${v.ipv4} : ${v.ipv6}";
+        #             ttl = 1;
+        #             zone_id = lib.tfRef "data.cloudflare_zones.domain.result[0].id";
+        #           };
+        #         })
+        #         exposed)
+        #       // {
+        #         main-zerotier = let
+        #           v = "data.terraform_remote_state.${zt.type}.outputs.instance_ips.${zt.key}";
+        #         in {
+        #           name = "zt.${domain}";
+        #           type = lib.tfRef ''${v}.ipv6 == null ? "A" : "AAAA"'';
+        #           content = lib.tfRef "${v}.ipv6 == null ? ${v}.ipv4 : ${v}.ipv6";
+        #           ttl = 1;
+        #           zone_id = lib.tfRef "data.cloudflare_zones.domain.result[0].id";
+        #         };
+        #       };
+        #   })
+        #
+        #   {
+        #     terraform.required_providers.cloudflare = {
+        #       source = "cloudflare/cloudflare";
+        #     };
+        #   }
+        #
+        #   {
+        #     provider = {
+        #       cloudflare = {
+        #       };
+        #     };
+        #     data = {
+        #       cloudflare_zones."domain" = {
+        #         name = domain;
+        #       };
+        #     };
+        #     remote_state.git.shou = {
+        #       owner = "Steryy";
+        #       repo = "flakeFactory";
+        #       path = "shou.state.json";
+        #     };
+        #   }
+        # ];
         extraArgs = {
           localLib = lib.local;
           inventory = shou config.clan.inventory;

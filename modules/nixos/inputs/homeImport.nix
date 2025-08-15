@@ -28,6 +28,9 @@
       imports =
         [
           "${direc}/default.nix"
+          {
+            home.stateVersion = config.system.stateVersion;
+          }
         ]
         ++ lib.optional (lib.pathExists "${direc}/importer.nix") (
           lib.local.importer.import {

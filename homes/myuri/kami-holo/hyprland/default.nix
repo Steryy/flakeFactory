@@ -8,22 +8,8 @@
     ./env.nix
     ./pyprland.nix
   ];
-  services.caelestia-shell.app2unit = pkgs.writeShellScriptBin "app2unit" ''
-    ${pkgs.hyprland}/bin/hyprctl dispatch -- exec  ${pkgs.gtk3}/bin/gtk-launch "$@"
-  '';
-  services.caelestia-shell.extraPackages = with pkgs; [
-    (writeShellScriptBin "caelestia" ''
-      if [[ "$1" == "wallpaper" && "$2" == "-f" ]]; then
-        swww img "$3" -t wave
-      fi
-      caelestia-quickshell "$@"
-    '')
-  ];
   services.hyprpaper.enable = lib.mkForce false;
 
-  home.packages = with pkgs; [
-    swww
-  ];
 
   wayland.windowManager.hyprland.plugins = with pkgs.hyprlandPlugins; [
     hypr-dynamic-cursors

@@ -7,7 +7,7 @@
       type = "github";
       owner = "hercules-ci";
       repo = "flake-parts";
-      inputs = { nixpkgs-lib = { follows = "nixpkgs"; }; };
+      inputs = {nixpkgs-lib = {follows = "nixpkgs";};};
     };
 
     srvos.url = "github:nix-community/srvos";
@@ -20,7 +20,7 @@
       inputs = {
         nixpkgs.follows = "nixpkgs";
         flake-parts.follows = "flake-parts";
-treefmt-nix.follows = "treefmt-nix";
+        treefmt-nix.follows = "treefmt-nix";
       };
     };
     sops-nix.follows = "clan-core/sops-nix";
@@ -28,7 +28,7 @@ treefmt-nix.follows = "treefmt-nix";
     nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
 
     haumea = {
-      inputs = { nixpkgs = { follows = "nixpkgs"; }; };
+      inputs = {nixpkgs = {follows = "nixpkgs";};};
       owner = "nix-community";
       repo = "haumea";
       type = "github";
@@ -47,7 +47,6 @@ treefmt-nix.follows = "treefmt-nix";
         nixpkgs.follows = "nixpkgs";
       };
     };
-   pkgs-by-name-for-flake-parts.url = "github:drupol/pkgs-by-name-for-flake-parts";
     caelestia-shell.url = "github:caelestia-dots/shell";
   };
 
@@ -70,6 +69,7 @@ treefmt-nix.follows = "treefmt-nix";
         src = ./lib/local;
         inputs = {
           lib = self;
+          hlib = inputs.haumea.lib;
           inherit flakeRoot;
         };
       };
@@ -86,19 +86,21 @@ treefmt-nix.follows = "treefmt-nix";
       haumea = {
         nixModules = {
           src = ./modules/nixos;
-      };
+        };
         hosts = {
           src = ./hosts;
           loader = _: import;
           _pipe = [
             (lib.attrsets.mapAttrsRecursiveCond (x: !(x ? "default"))
-              (_: v: if v ? "default" then v.default else v))
+              (_: v:
+                if v ? "default"
+                then v.default
+                else v))
             (lib.mapAttrs (n:
               lib.filterAttrs (n2: v:
-                if v ? "modules" then
-                  true
-                else
-                  throw "Host ${n}-${n2} doesnt have modules")))
+                if v ? "modules"
+                then true
+                else throw "Host ${n}-${n2} doesnt have modules")))
             (lib.mapAttrs (n:
               lib.mapAttrs' (n2: value: {
                 inherit value;
@@ -110,25 +112,20 @@ treefmt-nix.follows = "treefmt-nix";
           src = ./modules/home;
           _pipe = [
             (lib.attrsets.mapAttrsRecursiveCond (x: !(x ? "default"))
-              (_: v: if v ? "default" then v.default else v))
+              (_: v:
+                if v ? "default"
+                then v.default
+                else v))
           ];
         };
         diskoModules = {
           src = ./modules/disko;
         };
-        clan = { src = ./modules/clan; };
+        clan = {src = ./modules/clan;};
         terranix = {
           src = ./modules/terranix;
         };
-
       };
-    imports = flakeModules ++ [
-      inputs.pkgs-by-name-for-flake-parts.flakeModule
-    ];
-
-    perSystem = {  ... }: {
-      # (3) point to your directory containing Nix packages
-      pkgsDirectory = ./packages;
-    };
-  });
+      imports = flakeModules;
+    });
 }

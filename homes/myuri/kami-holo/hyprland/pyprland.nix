@@ -11,7 +11,7 @@
         prev2 = "movefocus u";
       };
       monitors = {
-        hotplug_command = "pkill swww; sleep 1 &&  swww-daemon";
+        # hotplug_command = "pkill swww; sleep 1 &&  swww-daemon";
         # hotplug_command =
         #   "pkill ags;  ags &"
         # ;
