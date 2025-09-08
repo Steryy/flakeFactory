@@ -1,6 +1,7 @@
 {
   lib,
   options,
+  config,
   ...
 }: let
   multiple = x: (
@@ -26,10 +27,10 @@ in {
       '',XF86AudioNext, exec, playerctl next || playerctl position `bc <<< "100 * $(playerctl metadata mpris:length) / 1000000 / 100"`''
     ];
     bindir =
-      lib.optional (options.services ? "caelestia-shell")
-      "Super, Super_L, exec, caelestia-quickshell shell toggle launcher";
+      lib.optional (options.programs ? "caelestia" && config.programs.caelestia.enable)
+      "Super, Super_L, exec, caelestia-shell ipc call drawers toggle launcher";
     bind =
-      (lib.optional (options.services ? "caelestia-shell")
+      (lib.optional (options.programs ? "caelestia" && config.programs.caelestia.enable)
         ", Super, exec, true")
       ++ [
         "Super, Return, exec, ghostty " # Launch foot (terminal)
