@@ -10,7 +10,6 @@ in {
         nextcloud.enable = true;
         vaultwarden.enable = true;
       };
-      acme.enable = true;
     };
   };
   modules = [
