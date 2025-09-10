@@ -13,30 +13,19 @@
 in {
   imports = [inputs.clan-core.flakeModules.clan];
   flake.clan = {
-    exportsModule = {
-      options = {
-        type = lib.mkOption {
-          type = lib.types.str;
-          default = "";
-        };
-        specialExports = lib.mkOption {
-          type = lib.types.attrsOf (
-            lib.types.anything
-          );
-          default = {};
-        };
-        settings = lib.mkOption {
-          default = {};
-          type = lib.types.attrsOf (
-            lib.types.anything
-          );
-        };
-      };
+    exportsModule = {_prefix, ...}: let
+      exportType = lib.head (lib.tail _prefix);
+      name = lib.last _prefix;
+    in {
+      # imports = lib.optional (exportType == "machines") ./exports/machines.nix;
+      options = {};
+      imports =
+        lib.optional (exportType == "instances") ./exports/services.nix;
+      #   ++ (
+      #     lib.optionals (exportType == "machines") ./exports/machines.nix
+      #   );
     };
     inherit modules;
-    inventory = {
-      # inherit modules;
-    };
     specialArgs = {
       exports = config.flake.clan.exports;
     };
