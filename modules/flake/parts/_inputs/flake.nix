@@ -35,7 +35,7 @@
     };
 
     matugen = {
-      url = "github:InioX/matugen";
+      url = "github:InioX/matugen/5d31db687e787c211441912c106d339bd26b170e";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         systems.follows = "systems";

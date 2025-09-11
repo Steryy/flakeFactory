@@ -25,7 +25,7 @@
     };
     sops-nix.follows = "clan-core/sops-nix";
 
-    nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
+    nixos-facter-modules.follows = "clan-core/nixos-facter-modules";
 
     haumea = {
       inputs = {nixpkgs = {follows = "nixpkgs";};};
