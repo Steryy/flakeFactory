@@ -47,7 +47,7 @@
         };
 
         systemd = {
-          socket = {
+          sockets = {
             lldap-cli = {
               socketConfig = {
                 Accept = true;
