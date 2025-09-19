@@ -1,4 +1,3 @@
-
 {lib, ...}: let
   inherit (lib) mkOption types;
   genSecr = pkgs: files: {
@@ -12,7 +11,7 @@
         lib.concatMapStringsSep "\n"
         (x:
           #bash
-          "openssl rand -base64 32 >  \"$out/${x}\" ") (lib.attrNames files);
+          "openssl rand -base64 32 | tr -d '\n' >  \"$out/${x}\" ") (lib.attrNames files);
     };
   };
 in {
@@ -200,7 +199,7 @@ in {
         ...
       }: let
         ensureFormat = pkgs.formats.json {};
-        bootstrapPkg = pkgs.callPackage ./package/default.nix {};
+        bootstrapPkg = pkgs.callPackage ../package/default.nix {};
         ensureGenerate = let
           filterNulls = lib.filterAttrsRecursive (n: v: v != null);
 
@@ -223,7 +222,7 @@ in {
           };
         in
           if lib.length paths == 0
-          then link
+          then "/dev/null"
           else "${link}/configs";
 
         quoteVariable = x: "\"${x}\"";
@@ -234,7 +233,6 @@ in {
         );
         # clan =
         assertions = [
-
           {
             assertion = settings.enforceUserMemberships -> !someUsersBelongToNonEnsuredGroup;
             message = ''
@@ -272,44 +270,48 @@ in {
         #   ]);
 
         systemd.services.lldap = {
-          postStart = ''
+          serviceConfig = {
+            ExecStartPost = "+${pkgs.writeShellScript "test" ''
+
               export LLDAP_URL=http://127.0.0.1:${toString cfg.settings.http_port}
               export LLDAP_ADMIN_USERNAME=${cfg.settings.ldap_user_dn}
-              export LLDAP_ADMIN_PASSWORD_FILE=${cfg.settings.ldap_user_pass_file}
+              export LLDAP_ADMIN_PASSWORD_FILE=${config.clan.core.vars.generators."ldap".files."password".path}
               export USER_CONFIGS_DIR=${lib.traceVal (
-              generateEnsureConfigDir "users"
-              (lib.mapAttrs (n: v:
-                v
-                // {
-                  password_file = config.clan.core.vars.generators.lldap-passwords.files."${n}".path;
-                })
-              ensureUsers)
-            )}
+                generateEnsureConfigDir "users"
+                (lib.mapAttrs (n: v:
+                  v
+                  // {
+                    password_file = config.clan.core.vars.generators.lldap-passwords.files."${n}".path;
+                  })
+                ensureUsers)
+              )}
               export GROUP_CONFIGS_DIR=${generateEnsureConfigDir "groups" ensureGroups}
               export USER_SCHEMAS_DIR=${
-              generateEnsureConfigDir "userFields" (lib.mapAttrs (n: v: [v]) settings.ensureUserFields)
-            }
+                generateEnsureConfigDir "userFields" (lib.mapAttrs (n: v: [v]) settings.ensureUserFields)
+              }
               export GROUP_SCHEMAS_DIR=${
-              generateEnsureConfigDir "groupFields" (lib.mapAttrs (n: v: [v]) settings.ensureGroupFields)
-            }
+                generateEnsureConfigDir "groupFields" (lib.mapAttrs (n: v: [v]) settings.ensureGroupFields)
+              }
               export DO_CLEANUP_USERS=${
-              if settings.enforceUsers
-              then "true"
-              else "false"
-            }
+                if settings.enforceUsers
+                then "true"
+                else "false"
+              }
               export DO_CLEANUP_USER_MEMBERSHIPS=${
-              if settings.enforceUserMemberships
-              then "true"
-              else "false"
-            }
+                if settings.enforceUserMemberships
+                then "true"
+                else "false"
+              }
               export DO_CLEANUP_GROUPS=${
-              if settings.enforceGroups
-              then "true"
-              else "false"
-            }
+                if settings.enforceGroups
+                then "true"
+                else "false"
+              }
 
-            ${bootstrapPkg}/bin/lldap-bootstrap
-          '';
+              ${bootstrapPkg}/bin/lldap-bootstrap
+
+            ''}";
+          };
         };
       };
     };

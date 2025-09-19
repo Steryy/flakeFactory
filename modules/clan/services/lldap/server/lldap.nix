@@ -26,7 +26,7 @@
           ];
           script = ''
             openssl genpkey -algorithm Ed25519 -out $out/ed.pem
-            step-cli crypto jwk create --from-pem=$out/ed.pem $out/ed.pub.json priv.json --no-password -f --insecure
+            step crypto jwk create --from-pem=$out/ed.pem $out/ed.pub.json priv.json --no-password -f --insecure
           '';
         };
         clan.core.vars.generators."ldap" = {
@@ -88,7 +88,7 @@
               enableACME = true;
               locations = {
                 "/jwt" = {
-                  proxyPass = "unix:/run/lldap-cli.socket";
+                  proxyPass = "unix://${config.systemd.sockets.lldap-cli.socketConfig.ListenStream}";
                 };
                 "/" = {
                   proxyPass = "http://localhost:3000";
@@ -105,11 +105,12 @@
             LLDAP_LDAP_USER_PASS_FILE = "%d/password";
           };
 
-          silenceForceUserPassResetWarning = true;
+          # silenceForceUserPassResetWarning = true;
           settings = {
+            force_ldap_user_pass_reset = "always";
             # verbose = true;
             ldap_base_dn = lib.concatMapStringsSep "," (d: "dc=${d}") (lib.splitString "." settings.domain);
-            ldap_user_email = "${config.services.lldap.settings.ldap_user_dn}@${settings.domain}";
+            ldap_user_email = "admin@${settings.domain}";
           };
         };
       };

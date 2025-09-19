@@ -17,15 +17,10 @@ in {
       type = lib.types.attrsOf (
         lib.types.submodule ({name, ...}: {
           config = let
-            tld = findlocalTld name config.security.acme.localTld;
-            isAccount = lib.hasPrefix "account-";
-            authority =
-              if isAccount
-              then lib.removePrefix "account-" tld
-              else tld;
+            tld = findlocalTld name config.security.acme.localtlds;
           in {
             email = lib.mkIf  ( tld != null) "acme@noemail.local";
-            server = lib.mkIf (tld != null) "https://ca.${authority}:1443/acme/acme/directory";
+            server = lib.mkIf (tld != null) "https://ca.${tld}:1443/acme/acme/directory";
           };
         })
       );

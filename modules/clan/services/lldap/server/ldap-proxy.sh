@@ -83,7 +83,7 @@ fi
 new_jwt=$(jwt encode   -i "$ISSUER" -e="$DURATION"   --secret "@$PRIVATEKEYFILE"  $additional  $groupReq )
 
 # Output the result as a JSON object
-cat <<EOF > &$FD
+cat <<EOF >&$FD
 {
   "access_token": "$LLDAP_TOKEN",
   "refresh_token": "$LLDAP_REFRESHTOKEN",
