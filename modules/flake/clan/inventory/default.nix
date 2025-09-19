@@ -1,42 +1,30 @@
 {lib, ...}: let
   inherit (lib.local.keys) fileFromGroup;
 in {
- flake. clan = {
-    inventory = {
-      instances = {
-        sshd = {
-          module.name = "sshd";
-          roles = {
-            server = {
-              tags.all = {};
-              extraModules = [
-                {
-                  users.users.root.openssh.authorizedKeys.keys = fileFromGroup {
-                    group = "admin";
-                    file = "sshkey";
-                  };
-                }
-              ];
-            };
-          };
-        };
-        ts = {
-          module = {
-            name = "@local/tailscale";
-            input = "self";
-          };
-          roles = {
-            client = {
-              tags.all = {};
-            };
-            headscale = {
-              settings = {
-                tld = "ts.stanley-dev.net";
-                listeningDomain = "zt.stanley-dev.net";
+  flake.clan.inventory.instances = {
+
+    acme-proxy = {
+      module = {
+        name = "@local/acme-proxy";
+        input = "self";
+      };
+      roles.proxy = {};
+      roles.client = {};
+    };
+
+    sshd = {
+      module.name = "sshd";
+      roles = {
+        server = {
+          tags.all = {};
+          extraModules = [
+            {
+              users.users.root.openssh.authorizedKeys.keys = fileFromGroup {
+                group = "admin";
+                file = "sshkey";
               };
-              machines.shou-jeannette = {};
-            };
-          };
+            }
+          ];
         };
       };
     };
