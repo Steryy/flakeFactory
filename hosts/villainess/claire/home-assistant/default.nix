@@ -6,9 +6,44 @@
   imports = [
     ./default-config.nix
     ./lovelace.nix
+    ./registry.nix
   ];
   config = {
     services.home-assistant = {
+      registry = {
+        area = {
+          entry = {
+            name = "Entry";
+            floor_id = "ground";
+            icon = "mdi:door";
+          };
+          living_room = {
+            name = "Living Room";
+            floor_id = "ground";
+            icon = "mdi:sofa";
+          };
+          bedroom = {
+            name = "Bedroom";
+            floor_id = "first";
+            icon = "mdi:bed";
+          };
+          kitchen = {
+            name = "Kitchen";
+            icon = "mdi:food";
+            floor_id = "ground";
+          };
+        };
+        floor = {
+          ground = {
+            name = "Ground";
+            level = 0;
+          };
+          first = {
+            name = "First";
+            level = 1;
+          };
+        };
+      };
       enable = true;
       extraComponents = [
         "homeassistant_hardware"
