@@ -7,6 +7,7 @@
     ./default-config.nix
     ./lovelace.nix
     ./registry.nix
+    ./waste-collection.nix
   ];
   config = {
     services.home-assistant = {
