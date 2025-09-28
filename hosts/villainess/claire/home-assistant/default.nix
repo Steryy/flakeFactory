@@ -82,7 +82,7 @@
       };
 
       "/var/lib/hass/themes/material_you.yaml"."L+" = {
-        argument = "${pkgs.callPackage ../material-theme.nix {}}/share/material_you.yaml";
+        argument = "${pkgs.callPackage  ./packages/material-theme.nix {}}/share/material_you.yaml";
       };
     };
   };
