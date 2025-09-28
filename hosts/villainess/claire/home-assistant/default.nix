@@ -8,6 +8,7 @@
     ./lovelace.nix
     ./registry.nix
     ./waste-collection.nix
+    ./mqtt.nix
   ];
   config = {
     services.home-assistant = {
