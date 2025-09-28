@@ -4,6 +4,7 @@
   ...
 }: {
   imports = [
+    ./auth.nix
     ./default-config.nix
     ./lovelace.nix
     ./registry.nix
