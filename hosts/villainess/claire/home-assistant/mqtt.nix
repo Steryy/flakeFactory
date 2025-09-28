@@ -7,6 +7,42 @@
 in {
   services = {
     home-assistant = {
+      registry.area = lib.pipe config.services.zigbee2mqtt.settings.devices [
+        lib.attrValues
+        (map (x: x.friendly_name))
+        (map (lib.split "/"))
+        (lib.groupBy (lib.head))
+
+        (lib.mapAttrs (_:
+            lib.filter (x: lib.elem (lib.last x) ["air-sensor" "temp-sensor" "humid-sensor"])))
+        (lib.filterAttrs (_: v: lib.length v != 0))
+        (lib.mapAttrs (
+          _: v: let
+            sorted = lib.sort (p: q: (lib.last p) < (lib.last q)) v;
+
+            senName = sensor: type:
+              if sensor == null
+              then null
+              else "sensor.${lib.replaceStrings ["/" "-"]
+                ["_" "_"] (lib.concatStringsSep "_"
+                  ((lib.filter (x: ! lib.isList x) sensor) ++ [type]))}";
+            first = lib.head sorted;
+            has = name: lib.findFirst (x: lib.last x == name) null sorted;
+
+            humidity = has "humid-sensor";
+            temp = has "temp-sensor";
+          in
+            if lib.last first == "air-sensor"
+            then {
+              humidity_entity_id = senName first "humidity";
+              temperature_entity_id = senName first "temperature";
+            }
+            else {
+              humidity_entity_id = senName humidity "humidity";
+              temperature_entity_id = senName temp "temperature";
+            }
+        ))
+      ];
       extraComponents = [
         "mqtt"
         # "zha"
