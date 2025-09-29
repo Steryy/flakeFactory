@@ -81,6 +81,7 @@ in {
         "Alt, Tab, cyclenext"
         "Alt, Tab, bringactivetotop,"
       ]
-      ++ (multiple (i: x: "Super, ${i}, split:workspace, ${x} # [hidden]"));
+      ++ (multiple (i: x: "Super, ${i}, ${lib.optionalString
+          (config.wayland.windowManager.hyprland.settings.plugin ? "hyprsplit") "split:"}workspace, ${x} # [hidden]"));
   };
 }

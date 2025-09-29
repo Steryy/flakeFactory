@@ -13,7 +13,7 @@
 
   wayland.windowManager.hyprland.plugins = with pkgs.hyprlandPlugins; [
     hypr-dynamic-cursors
-    hyprsplit
+    # hyprsplit
   ];
   wayland.windowManager.hyprland.settings = {
     plugin = {
@@ -21,9 +21,9 @@
         enabled = true;
         mode = "rotate";
       };
-      hyprsplit = {
-        num_workspaces = 10;
-      };
+      # hyprsplit = {
+      #   num_workspaces = 10;
+      # };
     };
     xwayland = {
       force_zero_scaling = true;

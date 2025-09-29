@@ -76,6 +76,7 @@ in {
         showOnHover = true;
         status = {
           showAudio = true;
+          showLockStatus = false;
           # showBattery = true;
           # showBluetooth = true;
           # showKbLayout = false;
@@ -107,7 +108,7 @@ in {
         dragThreshold = 50;
         enabled = true;
         mediaUpdateInterval = 500;
-        showOnHover = true;
+        showOnHover = false;
         visualiserBars = 45;
       };
 
