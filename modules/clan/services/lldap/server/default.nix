@@ -11,16 +11,23 @@
         lib.concatMapStringsSep "\n"
         (x:
           #bash
-          "openssl rand -base64 32 | tr -d '\n' >  \"$out/${x}\" ") (lib.attrNames files);
+          ''openssl rand -base64 32 | tr -d '\n' | tr -d ' ' >  "$out/${x}" '') (lib.attrNames files);
     };
   };
 in {
   roles.client = {
-    perInstance = {settings, ...}: {
+    perInstance = {
+      settings,
+      roles,
+      machine,
+      ...
+    }: let
+      names = lib.attrNames roles.server.machines;
+    in {
       nixosModule = {pkgs, ...}: {
-        config.clan.core.vars = genSecr pkgs (
+        config.clan.core.vars = lib.mkIf (! lib.elem machine.name names) (genSecr pkgs (
           lib.mapAttrs (_: _: {}) settings.ensureUsers
-        );
+        ));
       };
     };
   };
