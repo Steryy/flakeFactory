@@ -38,7 +38,7 @@
                     type = types.attrsOf valueType;
                   };
                   id = mkOption {
-                    type = types.strMatching "[a-zA-Z0-9-]+";
+                    type = types.strMatching "[a-zA-Z0-9_-]+";
                     description = "Username.";
                     default = name;
                   };
@@ -117,7 +117,7 @@
                     type = types.attrsOf valueType;
                   };
                   name = mkOption {
-                    type = types.strMatching "[a-zA-Z0-9-]+";
+                    type = types.strMatching "[a-zA-Z0-9_-]+";
                     description = "Name of the group.";
                     default = name;
                   };

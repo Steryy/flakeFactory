@@ -36,7 +36,7 @@ in {
       ensureFieldsOptions = name: {
         name = mkOption {
           type =
-            types.strMatching "[a-zA-Z0-9-]+";
+            types.strMatching "[a-zA-Z0-9_-]+";
           description = "Name of the field.";
           default = name;
         };
