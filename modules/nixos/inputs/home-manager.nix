@@ -5,6 +5,7 @@
   flakeRoot,
   options,
   inputs,
+  pkgs,
   ...
 }: let
   hn = config.networking.hostName;
@@ -58,6 +59,7 @@
 in {
   imports = [extraInputs.home-manager.nixosModules.home-manager];
   config = {
+    environment.systemPackages = with pkgs; [home-manager];
     home-manager = {
       useGlobalPkgs = true;
       backupFileExtension = "backupe";

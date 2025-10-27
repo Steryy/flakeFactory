@@ -1,7 +1,7 @@
-{inputs, ...}: let
+{extraInputs, ...}: let
 in {
   imports = [
-    inputs.caelestia-shell.homeManagerModules.default
+    extraInputs.caelestia-shell.homeManagerModules.default
     ./settings.nix
   ];
 

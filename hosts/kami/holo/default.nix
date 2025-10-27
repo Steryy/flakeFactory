@@ -16,7 +16,7 @@ in {
       };
     };
     inputs = {
-      homeImport.enable = true;
+      home-manager.enable = true;
       impermanance.enable = true;
       stylix.enable = true;
       matugen.enable = true;

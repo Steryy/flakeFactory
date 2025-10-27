@@ -2,6 +2,7 @@
   description = "A very basic flake";
 
   inputs = {
+    caelestia-shell.url = "github:caelestia-dots/shell";
     systems.url = "github:nix-systems/default";
     nixpkgs.url = "github:nixos/nixpkgs?ref=8a2f738d9d1f1d986b5a4cd2fd2061a7127237d7";
     flake-utils.url = "github:numtide/flake-utils";
@@ -44,7 +45,6 @@
 
     nixos-generators = {
       url = "github:nix-community/nixos-generators";
-
       inputs.nixpkgs.follows = "nixpkgs";
     };
     quickshell = {
