@@ -7,11 +7,11 @@
 in {
   perSystem = {pkgs, ...}: {
     config.terranix = let
-      package = pkgs.opentofu.withPlugins (p: [
-        p.external
-        p.local
-        p. null
-        p.aws
+      package = pkgs.opentofu.withPlugins (p: with p; [
+        hashicorp_external
+        hashicorp_local
+        hashicorp_null
+        hashicorp_aws
       ]);
     in {
       terranixConfigurations.terraform-shou = {

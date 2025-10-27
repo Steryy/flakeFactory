@@ -9,7 +9,7 @@
       git = {
         paging = {
           colorArg = "always";
-          pager = "${config.programs.git.extraConfig.core.pagerWit}";
+          # pager = "${config.programs.git.extraConfig.core.pagerWit}";
         };
       };
     };

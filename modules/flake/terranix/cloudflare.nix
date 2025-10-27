@@ -55,11 +55,13 @@ in {
   flake.exposed = exposed;
   perSystem = {pkgs, ...}: {
     config.terranix = let
-      package = pkgs.opentofu.withPlugins (p: [
-        p.external
-        p.local
-        p.cloudflare
-      ]);
+      package = pkgs.opentofu.withPlugins (p:
+        with p; [
+          hashicorp_external
+          hashicorp_local
+          hashicorp_null
+          cloudflare_cloudflare
+        ]);
     in {
       terranixConfigurations.terraform-cloudflaire = {
         terraformWrapper.package = package;

@@ -7,7 +7,7 @@ in {
         forgejo.enable = true;
         postgres.enable = true;
         home-assistant.enable = true;
-        nextcloud.enable = true;
+        # nextcloud.enable = true;
         vaultwarden.enable = true;
       };
     };
@@ -27,13 +27,6 @@ in {
         "/dev/disk/by-id/ata-SAMSUNG_SSD_PM871b_M.2_2280_128GB_S3U2NE0M643392";
       networking.domains = [ "home.stanley-dev.net" ];
 
-      services.nextcloud = {
-
-        extraApps = {
-          inherit (config.services.nextcloud.package.packages.apps)
-            contacts calendar tasks mail cospend;
-        };
-      };
 
       services.home-assistant = {
         extraComponents = [

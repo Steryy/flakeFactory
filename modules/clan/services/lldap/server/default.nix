@@ -32,6 +32,7 @@ in {
     };
   };
   roles.server = {
+    description = "lldap server";
     interface = {...}: let
       ensureFieldsOptions = name: {
         name = mkOption {

@@ -6,5 +6,7 @@
     ./server/lldap.nix
     ./client.nix
   ];
-  roles.client = {};
+  roles.client = {
+    description = "Client for lldap server. It also allows for creating shared credentials with server.";
+  };
 }
