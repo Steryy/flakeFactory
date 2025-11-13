@@ -25,6 +25,14 @@ in {
     config = {
       waste_collection_schedule = {
         sources = [
+          {
+            name = "!secret waste-source";
+            args = {
+              town = "!secret waste-town";
+              street = "!secret waste-street";
+              house_number = "!secret waste-house_number";
+            };
+          }
         ];
       };
 
