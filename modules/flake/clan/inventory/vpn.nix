@@ -23,27 +23,27 @@ in {
         };
       };
     };
-    lldap = {
-      module = {
-        name = "@local/lldap";
-        input = "self";
-      };
-      roles.client = {
-        machines.kami-holo.settings = {
-          ensureGroups = {};
-          ensureUsers = {
-            myuri = {
-              email = "myuri@${ldapDomain}";
-            };
-          };
-        };
-      };
-      roles.server.machines.villainess-claire = {
-        settings = {
-          domain = ldapDomain;
-        };
-      };
-    };
+    # lldap = {
+    #   module = {
+    #     name = "@local/lldap";
+    #     input = "self";
+    #   };
+    #   roles.client = {
+    #     machines.kami-holo.settings = {
+    #       ensureGroups = {};
+    #       ensureUsers = {
+    #         myuri = {
+    #           email = "myuri@${ldapDomain}";
+    #         };
+    #       };
+    #     };
+    #   };
+    #   roles.server.machines.villainess-claire = {
+    #     settings = {
+    #       domain = ldapDomain;
+    #     };
+    #   };
+    # };
     mc = {
       module = {
         name = "mycelium";
