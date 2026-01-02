@@ -19,7 +19,6 @@
 in {
   _class = "clan.service";
   manifest.name = "@local/rathole";
-  manifest.readme = ./readme.md;
   manifest.description = "Rust reverse proxy";
   roles.server = {
     description = "Server to use for reverse proxy";
