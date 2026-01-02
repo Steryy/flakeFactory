@@ -16,19 +16,6 @@ in {
       ];
       networking.firewall.allowedTCPPorts = [ 8080 ];
       # networking.networkd
-      services.avahi = {
-        enable = true;
-        nssmdns4 = true;
-        nssmdns6 = true;
-        publish = {
-          enable = true;
-          addresses = true;
-          domain = true;
-          hinfo = true;
-          userServices = true;
-          workstation = true;
-        };
-      };
       boot.loader = {
         efi.canTouchEfiVariables = true;
         systemd-boot.enable = true;
