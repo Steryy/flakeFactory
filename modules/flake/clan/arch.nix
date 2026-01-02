@@ -15,7 +15,7 @@
           then []
           else ["arch:x86_64"];
         arch =
-          if lib.length getArchs > 1
+          if lib.length getArchs == 1
           then lib.removePrefix "arch:" arch
           else "x86_64";
         number = lib.length getArchs;
