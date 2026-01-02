@@ -4,11 +4,6 @@ in {
   importer = {
     services = {
       hosted = {
-        forgejo.enable = true;
-        postgres.enable = true;
-        home-assistant.enable = true;
-        # nextcloud.enable = true;
-        vaultwarden.enable = true;
       };
     };
   };
@@ -16,6 +11,7 @@ in {
     ({ inputs, pkgs, config, flakeRoot, ... }: {
       imports = [ 
         (flakeRoot + "/modules/disko/ext4.nix") 
+        ./home-assistant
       ];
       clan.core.postgresql.enable = true;
       nixpkgs.hostPlatform = "x86_64-linux";
@@ -28,31 +24,7 @@ in {
       networking.domains = [ "home.stanley-dev.net" ];
 
 
-      services.home-assistant = {
-        extraComponents = [
-          "wled"
-          "vlc"
-          "zha" # zigbee
-          "esphome"
-          "radio_browser"
-          "homekit"
-          "homekit_controller"
-          "nextcloud"
-        ];
-        customComponents = with pkgs.home-assistant-custom-components; [
-          tuya_local
-
-          spook
-        ];
-        config = {
-          media_player = [{
-            platform = "vlc";
-            arguments = "'--alsa-audio-device=hw:1,0' ";
-          }];
-
-          tts.platform = "google_translate";
-        };
-      };
+      
 
     })
   ];

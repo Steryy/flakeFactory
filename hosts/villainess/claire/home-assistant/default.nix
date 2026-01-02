@@ -10,6 +10,7 @@
     ./registry.nix
     ./waste-collection.nix
     ./mqtt.nix
+    ./esphome.nix
   ];
   config = {
     services.home-assistant = {
